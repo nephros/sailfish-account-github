@@ -100,28 +100,28 @@ fi
 %license LICENSES/BSD-3-Clause.txt
 %license LICENSES/LGPL-2.1-or-later.txt
 #%%{_libdir}/libgithubcommon.so.*
-#%%exclude %{_libdir}/libgithubcommon.so
+#%%exclude %%{_libdir}/libgithubcommon.so
 %{_libdir}/libgithubbuteocommon.so.*
 %exclude %{_libdir}/libgithubbuteocommon.so
 %{_datadir}/accounts/providers/github.provider
-%{_datadir}/accounts/services/github-notifications.service
+#%%{_datadir}/accounts/services/github-notifications.service
 %{_datadir}/accounts/ui/GitHubSettingsDisplay.qml
 %{_datadir}/accounts/ui/github.qml
 %{_datadir}/accounts/ui/github-settings.qml
 %{_datadir}/accounts/ui/github-update.qml
 %{_libdir}/qt5/qml/com/jolla/settings/accounts/github/*
 %{_datadir}/translations/settings-accounts-github_eng_en.qm
-%{_datadir}/themes/sailfish-default/silica/*/icons/github-mark*.png
+#%%{_datadir}/themes/sailfish-default/silica/*/icons/github-mark*.png
 %{_libdir}/buteo-plugins-qt5/oopp/libgithub-notifications-client.so
 %config %{_sysconfdir}/buteo/profiles/client/github-notifications.xml
 %config %{_sysconfdir}/buteo/profiles/sync/github.Notifications.xml
 #%%{_libdir}/qt5/qml/com/jolla/eventsview/github/*
 #%%{_datadir}/lipstick/eventfeed/github-delegate.qml
 #%%{_datadir}/lipstick/eventfeed/GitHubFeedItem.qml
-%{_datadir}/translations/lipstick-jolla-home-github_eng_en.qm
+#%%{_datadir}/translations/lipstick-jolla-home-github_eng_en.qm
 %{_datadir}/translations/lipstick-jolla-home-github-notifications_eng_en.qm
 
 %files -n sailfish-account-github-ts-devel
 %{_datadir}/translations/source/settings-accounts-github.ts
-%{_datadir}/translations/source/lipstick-jolla-home-github.ts
+#%%{_datadir}/translations/source/lipstick-jolla-home-github.ts
 %{_datadir}/translations/source/lipstick-jolla-home-github-notifications.ts
