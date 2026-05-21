@@ -42,12 +42,10 @@ PKGCONFIG += mlite5 nemonotifications-qt5
 INCLUDEPATH += $$PWD
 
 SOURCES += \
-    $$PWD/githubdatatypesyncadaptor.cpp \
     $$PWD/githubnotificationsplugin.cpp \
     $$PWD/githubnotificationssyncadaptor.cpp
 
 HEADERS += \
-    $$PWD/githubdatatypesyncadaptor.h \
     $$PWD/githubnotificationsplugin.h \
     $$PWD/githubnotificationssyncadaptor.h
 
