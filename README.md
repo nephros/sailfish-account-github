@@ -25,19 +25,16 @@ This repository contains a mix of `BSD-3-Clause` and
 `LGPL-2.1-or-later` source files. REUSE metadata in the tree records the
 license for each file.
 
-The `LGPL-2.1-or-later` parts are the shared sync and cache layer:
-
-- `buteo-plugins/buteo-common/*`
-- `buteo-plugins/buteo-sync-plugin-github-posts/*`
-- `buteo-plugins/buteo-sync-plugin-github-notifications/*`
-- `common/githubpostsdatabase.*`
-- `eventsview-plugins/eventsview-plugin-github/githubpostsmodel.*`
+The `LGPL-2.1-or-later` parts are the shared sync and cache layer.
 
 These files are kept under LGPL because they are adapted from existing
 Sailfish OS social sync and social cache code, especially the public
-`buteo-sync-plugins-social` and `libsocialcache` codebases. The more
-GitHub-specific helper, UI, and integration files are BSD-licensed unless
-noted otherwise.
+`buteo-sync-plugins-social` and `libsocialcache` codebases.
+
+For details see the README of the `sailfish-account-mastodon` package.
+
+The more GitHub-specific helper, UI, and integration files are BSD-licensed
+unless noted otherwise.
 
 ## Third-Party Marks
 
@@ -46,8 +43,7 @@ OCTOCAT® logo design are trademarks of GitHub, Inc., registered in the United
 States and other countries.
 
 No adaptation or use of any kind of any of our registered trademarks or
-copyrights, or any other contents of this website, is allowed without the
-express written permission of GitHub, Inc.
+copyrights, is allowed without the express written permission of GitHub, Inc.
 
 For more information regarding the authorized uses of these items, please
 [contact GitHub](https://github.com/contact)
