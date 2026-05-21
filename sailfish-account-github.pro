@@ -9,7 +9,6 @@ SUBDIRS += \
     settings \
     transferengine-plugins \
     buteo-plugins \
-    eventsview-plugins \
     icons
 
 # buteo-plugins.depends = common
