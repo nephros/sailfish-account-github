@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE provider>
+<provider version="1.0" id="github">
+    <name>GitHub</name>
+    <description>MS GitHub account provider</description>
+    <!--
+    <icon>image://theme/graphic-service-github</icon>
+    -->
+    <icon>image://theme/github-mark-white</icon>
+
+    <tags>
+        <tag>user-group:account-github</tag>
+    </tags>
+
+    <template>
+        <group name="auth">
+            <setting name="method">oauth2</setting>
+            <setting name="mechanism">web_server</setting>
+            <!--
+            <setting name="mechanism">user_agent</setting>
+            -->
+            <group name="oauth2">
+                <group name="web_server">
+                    <setting name="Host">github.com</setting>
+                    <setting name="AllowedSchemes" type="as">["https"]</setting>
+                    <setting name="AuthPath">/login/oauth/authorize</setting>
+                    <setting name="ResponseType">code</setting>
+                    <setting name="TokenPath">/login/oauth/access_token</setting>
+                    <setting name="Scope" type="as">["notifications"]</setting>
+                    <setting name="RedirectUri">https://api.github.com/user</setting>
+                    <setting name="ExternalBrowser">false</setting>
+                </group>
+            </group>
+        </group>
+    </template>
+</provider>

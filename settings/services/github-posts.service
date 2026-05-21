@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<service id="github-notifications">
+    <type>posts</type>
+    <name>Notifications</name>
+    <icon>image://theme/icon-lock-social</icon>
+    <provider>github</provider>
+
+    <template>
+        <setting name="sync_profile_templates" type="as">["github.Notifications"]</setting>
+        <group name="auth">
+            <setting name="method">oauth2</setting>
+            <setting name="mechanism">web_server</setting>
+        </group>
+    </template>
+</service>
