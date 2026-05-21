@@ -7,8 +7,6 @@
 TEMPLATE = subdirs
 SUBDIRS += \
     buteo-common \
-    buteo-sync-plugin-github-posts \
     buteo-sync-plugin-github-notifications
 
-buteo-sync-plugin-github-posts.depends = buteo-common
 buteo-sync-plugin-github-notifications.depends = buteo-common
