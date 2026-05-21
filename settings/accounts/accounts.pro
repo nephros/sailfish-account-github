@@ -43,7 +43,7 @@ provider.files += $$PWD/providers/github.provider
 provider.path = /usr/share/accounts/providers/
 
 services.files += \
-    $$PWD/services/github-notifications.service \
+    $$PWD/services/github-notifications.service
 services.path = /usr/share/accounts/services/
 
 ui.files += \
