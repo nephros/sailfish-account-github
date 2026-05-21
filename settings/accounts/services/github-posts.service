@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <service id="github-notifications">
-    <type>posts</type>
+    <type>microblogging</type>
     <name>Notifications</name>
     <icon>image://theme/icon-lock-social</icon>
     <provider>github</provider>

@@ -31,7 +31,7 @@ StandardAccountSettingsDisplay {
             //otherServicesDisplay.serviceModel = otherServices
 
             // load the initial settings, using the first set of sync options as reference
-            var postSyncOptions = allSyncOptionsForService("github-posts")
+            var postSyncOptions = allSyncOptionsForService("github-microblogging")
             for (var profileId in postSyncOptions) {
                 notificationSchedule.syncOptions = postSyncOptions[profileId]
                 break
