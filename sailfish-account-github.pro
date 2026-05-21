@@ -7,7 +7,6 @@
 TEMPLATE = subdirs
 SUBDIRS += \
     settings \
-    transferengine-plugins \
     buteo-plugins \
     icons
 
