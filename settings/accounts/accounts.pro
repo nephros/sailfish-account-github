@@ -33,7 +33,6 @@ PRE_TARGETDEPS += ts engineering_english
 
 OTHER_FILES += \
     $$PWD/providers/github.provider \
-    $$PWD/services/github-microblog.service \
     $$PWD/services/github-notifications.service \
     $$PWD/ui/GitHubSettingsDisplay.qml \
     $$PWD/ui/github.qml \
@@ -44,7 +43,6 @@ provider.files += $$PWD/providers/github.provider
 provider.path = /usr/share/accounts/providers/
 
 services.files += \
-    $$PWD/services/github-microblog.service \
     $$PWD/services/github-notifications.service \
 services.path = /usr/share/accounts/services/
 
