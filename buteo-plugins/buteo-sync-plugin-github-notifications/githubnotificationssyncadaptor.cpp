@@ -19,7 +19,7 @@
  **
  ****************************************************************************/
 
-#include "githubnotificationsyncadaptor.h"
+#include "githubnotificationssyncadaptor.h"
 #include "trace.h"
 
 #include <QJsonObject>

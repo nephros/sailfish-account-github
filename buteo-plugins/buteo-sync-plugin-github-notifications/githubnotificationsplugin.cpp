@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "githubnotificationsplugin.h"
-#include "githubnotificationsyncadaptor.h"
+#include "githubnotificationssyncadaptor.h"
 #include "socialnetworksyncadaptor.h"
 
 GithubNotificationsPlugin::GithubNotificationsPlugin(const QString& pluginName,
