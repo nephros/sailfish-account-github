@@ -104,7 +104,7 @@ fi
 %{_libdir}/libgithubbuteocommon.so.*
 %exclude %{_libdir}/libgithubbuteocommon.so
 %{_datadir}/accounts/providers/github.provider
-#%%{_datadir}/accounts/services/github-notifications.service
+%{_datadir}/accounts/services/github-notifications.service
 %{_datadir}/accounts/ui/GitHubSettingsDisplay.qml
 %{_datadir}/accounts/ui/github.qml
 %{_datadir}/accounts/ui/github-settings.qml
