@@ -54,6 +54,7 @@ For more information regarding the authorized uses of these items, please
 
 <!--
 SPDX-FileCopyrightText: 2026 Jolla Mobile Ltd
+SPDX-FileCopyrightText: 2025,2026 Peter G. <sailfish@nephros.org>
 
 SPDX-License-Identifier: BSD-3-Clause
 -->
