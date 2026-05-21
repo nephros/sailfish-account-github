@@ -13,3 +13,6 @@ CONFIG += link_pkgconfig
 PKGCONFIG += accounts-qt5 buteosyncfw5 socialcache libsignon-qt5 libsailfishkeyprovider
 
 LIBS += -L$$PWD -lgithubbuteocommon
+
+DEFINES += 'SYNC_DATABASE_DIR=\'\"Sync\"\''
+
