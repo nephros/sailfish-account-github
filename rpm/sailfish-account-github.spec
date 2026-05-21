@@ -71,13 +71,15 @@ systemctl-user try-restart msyncd.service || :
 theme_dir=%{_datadir}/themes/sailfish-default
 legacy_dir="$theme_dir/meegotouch"
 if [ -d "$legacy_dir" ]; then
-    for icon in "$theme_dir"/silica/*/icons/icon-l-github.png; do
-        [ -e "$icon" ] || continue
-        scale="$(basename "$(dirname "$(dirname "$icon")")")"
-        target_dir="$legacy_dir/$scale/icons"
-        [ -d "$target_dir" ] || continue
-        ln -sfn "../../../silica/${scale}/icons/icon-l-github.png" \
-            "$target_dir/icon-l-github.png"
+    for iconname in github-mark-white.png github-mark.png; do
+        for icon in "$theme_dir"/silica/*/icons/%{iconname}; do
+            [ -e "$icon" ] || continue
+            scale="$(basename "$(dirname "$(dirname "$icon")")")"
+            target_dir="$legacy_dir/$scale/icons"
+            [ -d "$target_dir" ] || continue
+            ln -sfn "../../../silica/${scale}/icons/%{iconname}" \
+                "$target_dir/%{iconname}"
+        done
     done
 fi
 
@@ -87,9 +89,11 @@ if [ "$1" -eq 0 ]; then
     theme_dir=%{_datadir}/themes/sailfish-default
     legacy_dir="$theme_dir/meegotouch"
     if [ -d "$legacy_dir" ]; then
-        for icon in "$legacy_dir"/*/icons/icon-l-github.png; do
-            [ -L "$icon" ] || continue
-            rm -f "$icon"
+        for iconname in github-mark-white.png github-mark.png; do
+            for icon in "$legacy_dir"/*/icons/${iconname}; do
+                [ -L "$icon" ] || continue
+                rm -f "$icon"
+            done
         done
     fi
     %{_libexecdir}/manage-groups remove account-github || :
@@ -112,7 +116,7 @@ fi
 %{_datadir}/accounts/ui/github-update.qml
 %{_libdir}/qt5/qml/com/jolla/settings/accounts/github/*
 %{_datadir}/translations/settings-accounts-github_eng_en.qm
-%{_datadir}/themes/sailfish-default/silica/*/icons/icon-l-github.png
+%{_datadir}/themes/sailfish-default/silica/*/icons/github-mark*.png
 %{_libdir}/buteo-plugins-qt5/oopp/libgithub-posts-client.so
 %config %{_sysconfdir}/buteo/profiles/client/github-posts.xml
 %config %{_sysconfdir}/buteo/profiles/sync/github.Posts.xml
