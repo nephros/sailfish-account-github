@@ -17,12 +17,15 @@ AccountCreationAgent {
     property QtObject _accountSetup
     property string _existingUserName
 
+    readonly property string apiUri: "https://api.github.com/user"
+    reqdonly property string apiVersion: "2022-11-28"
+
     function _handleAccountCreated(accountId, responseData) {
         var props = {
             "accessToken": responseData["AccessToken"],
             "accountId": accountId
         }
-        var _accountSetup = accountSetupComponent.createObject(root, props)
+        _accountSetup = accountSetupComponent.createObject(root, props)
         _accountSetup.done.connect(function() {
             accountCreated(accountId)
             _goToSettings(accountId)
@@ -41,7 +44,7 @@ AccountCreationAgent {
             _settingsDialog.destroy()
         }
         _settingsDialog = settingsComponent.createObject(root, {"accountId": accountId})
-        pageStack.animatorReplace(_settingsDialog)
+        pageStack.replace(_settingsDialog)
     }
 
     initialPage: AccountCreationLegaleseDialog {
@@ -73,9 +76,10 @@ AccountCreationAgent {
         id: accountSetupComponent
         QtObject {
             id: accountSetup
+
+            property int accountId
             property string accessToken
             property bool hasSetName
-            property int accountId
 
             signal done()
             signal error()
@@ -83,6 +87,7 @@ AccountCreationAgent {
             property Account newAccount: Account {
                 id: account
                 identifier: accountSetup.accountId
+
                 onStatusChanged: {
                     if (status === Account.Initialized || status === Account.Synced) {
                         if (!accountSetup.hasSetName) {
@@ -142,12 +147,10 @@ AccountCreationAgent {
                     }
                 }
 
-                // deprecated, see https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param/
-                //var url = "https://api.github.com/user?access_token=" + accessToken
-                var url = "https://api.github.com/user"
-                doc.open("GET", url)
+                var url = apiUri;
+                doc.open("GET", url);
                 doc.setRequestHeader('Accept', 'application/vnd.github+json');
-                doc.setRequestHeader('X-GitHub-Api-Version', '2022-11-28');
+                doc.setRequestHeader('X-GitHub-Api-Version', apiVersion);
                 doc.setRequestHeader('Authorization', 'Bearer:' + accessToken);
                 doc.send()
             }
@@ -211,6 +214,7 @@ AccountCreationAgent {
 
                 GitHubSettingsDisplay {
                     id: settingsDisplay
+
                     anchors.top: header.bottom
                     accountManager: root.accountManager
                     accountProvider: root.accountProvider

@@ -12,8 +12,8 @@ import com.jolla.settings.accounts 1.0
 AccountCredentialsAgent {
     id: root
 
-    function _start() {
-        if (initialPage.status != PageStatus.Active || account.status != Account.Initialized) {
+    function _startUpdate() {
+        if (initialPage.status !== PageStatus.Active || account.status !== Account.Initialized) {
             return
         }
         var sessionData = {
@@ -28,7 +28,7 @@ AccountCredentialsAgent {
         identifier: root.accountId
 
         onStatusChanged: {
-            root._start()
+            root._startUpdate()
         }
     }
 
@@ -38,7 +38,7 @@ AccountCredentialsAgent {
 
     initialPage: OAuthAccountSetupPage {
         onStatusChanged: {
-            root._start()
+            root._startUpdate()
         }
 
         onAccountCredentialsUpdated: {
@@ -48,6 +48,12 @@ AccountCredentialsAgent {
 
         onAccountCredentialsUpdateError: {
             root.credentialsUpdateError(errorMessage)
+        }
+
+        onPageContainerChanged: {
+            if (pageContainer == null) {
+                cancelSignIn()
+            }
         }
     }
 }

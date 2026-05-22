@@ -22,7 +22,6 @@ AccountSettingsAgent {
 
         Component.onDestruction: {
             if (status == PageStatus.Active) {
-                // app closed while settings are open, so save settings synchronously
                 settingsDisplay.saveAccount(true)
             }
         }
@@ -37,9 +36,10 @@ AccountSettingsAgent {
 
             StandardAccountSettingsPullDownMenu {
                 visible: settingsDisplay.accountValid
-                allowCredentialsUpdate: root.accountNotSignedIn
-
-                onCredentialsUpdateRequested: credentialsUpdater.replaceWithCredentialsUpdatePage(root.accountId)
+                allowSync: true
+                onCredentialsUpdateRequested: {
+                    credentialsUpdater.replaceWithCredentialsUpdatePage(root.accountId)
+                }
                 onAccountDeletionRequested: {
                     root.accountDeletionRequested()
                     pageStack.pop()
@@ -51,11 +51,14 @@ AccountSettingsAgent {
 
             PageHeader {
                 id: header
+
                 title: root.accountsHeaderText
+
             }
 
             GitHubSettingsDisplay {
                 id: settingsDisplay
+
                 anchors.top: header.bottom
                 accountManager: root.accountManager
                 accountProvider: root.accountProvider
