@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "githubdatatypesyncadaptor.h"
+#include "trace.h"
 
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QVariantMap>
