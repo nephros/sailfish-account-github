@@ -32,7 +32,8 @@ class GithubNotificationsDataTypeSyncAdaptor : public SocialNetworkSyncAdaptor
 public:
     GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::DataType dataType, QObject *parent);
     virtual ~GithubNotificationsDataTypeSyncAdaptor();
-    virtual void sync(const QString &dataTypeString, int accountId);
+
+    void sync(const QString &dataTypeString, int accountId);
 
 protected:
     QString clientId();
