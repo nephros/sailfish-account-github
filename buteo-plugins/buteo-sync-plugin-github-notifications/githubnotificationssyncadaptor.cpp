@@ -41,7 +41,27 @@ namespace {
     //% "GitHub"
     const char *const TrIdGitHub = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-github");
     //% "New notification"
-    const char *const TrIdNewNotification = QT_TRID_NOOP("lipstick-jolla-home-la-mastodon-notification-new_notification");
+    const char *const TrIdNewNotification = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-new_notification");
+
+    bool hasActiveNotificationsForAccount(int accountId, const Notification *ignoredNotification = 0)
+    {
+        bool hasActiveNotifications = false;
+        const QList<QObject *> notifications = Notification::notifications();
+        foreach (QObject *object, notifications) {
+            Notification *notification = qobject_cast<Notification *>(object);
+            if (notification
+                    && notification != ignoredNotification
+                    && notification->category() == QLatin1String(NotificationCategory)
+                    && notification->hintValue("x-nemo.sociald.account-id").toInt() == accountId) {
+                hasActiveNotifications = true;
+            }
+
+            delete object;
+        }
+
+        return hasActiveNotifications;
+    }
+
 }
 
 GithubNotificationsSyncAdaptor::GithubNotificationsSyncAdaptor(QObject *parent)
@@ -256,6 +276,32 @@ void GithubNotificationsSyncAdaptor::notificationClosedWithReason(uint reason)
         markReadFromNotification(notification);
     }
 }
+
+void GithubNotificationsSyncAdaptor::maybeMarkAccountNotificationsRead(int accountId,
+                                                                         const QString &accessToken,
+                                                                         Notification *ignoredNotification)
+{
+    if (accountId <= 0 || accessToken.isEmpty()) {
+        return;
+    }
+
+    if (hasActiveNotificationsForAccount(accountId, ignoredNotification)) {
+        return;
+    }
+
+    const QString lastReadId = loadLastFetchedId(accountId);
+    if (lastReadId.isEmpty()) {
+        return;
+    }
+
+    const QString currentMarkerId = m_lastMarkedReadIds.value(accountId);
+    if (!currentMarkerId.isEmpty() && compareNotificationIds(lastReadId, currentMarkerId) <= 0) {
+        return;
+    }
+
+    requestMarkRead(accountId, accessToken, lastReadId);
+}
+
 
 Notification *GithubNotificationsSyncAdaptor::createNotification(int accountId, const QString &notificationId)
 {

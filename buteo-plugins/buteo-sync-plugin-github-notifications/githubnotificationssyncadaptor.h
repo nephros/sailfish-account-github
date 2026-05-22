@@ -43,17 +43,23 @@ private:
                               const QString &until = QString(),
                               const QString &pagingToken = QString());
 
+    static int compareNotificationIds(const QString &left, const QString &right);
+    QString loadLastFetchedId(int accountId) const;
+    void saveLastFetchedId(int accountId, const QString &lastFetchedId);
     void requestMarkRead(int accountId, const QString &accessToken, const QString &lastReadId);
     void publishSystemNotification(int accountId, const PendingNotification &notificationData);
     Notification *createNotification(int accountId, const QString &notificationId);
     Notification *findNotification(int accountId, const QString &notificationId);
     void closeAccountNotifications(int accountId, const QSet<QString> &keepNotificationIds = QSet<QString>());
     static QString notificationObjectKey(int accountId, const QString &notificationId);
+    void maybeMarkAccountNotificationsRead(int accountId,
+                                           const QString &accessToken,
+                                           Notification *ignoredNotification = 0);
+    void markReadFromNotification(Notification *notification);
+    void removeCachedNotification(Notification *notification);
 
     QDateTime lastSuccessfulSyncTime(int accountId);
     void setLastSuccessfulSyncTime(int accountId);
-    void markReadFromNotification(Notification *notification);
-    void removeCachedNotification(Notification *notification);
 
 private Q_SLOTS:
     void finishedNotificationsHandler();
@@ -67,6 +73,7 @@ private:
         int accountId;
         QJsonObject notification;
     };
+    QHash<int, QString> m_lastMarkedReadIds;
     QHash<QString, Notification *> m_notificationObjects;
     GithubNotificationsDatabase m_db;
 };
