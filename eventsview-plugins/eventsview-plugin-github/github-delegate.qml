@@ -19,7 +19,15 @@ SocialMediaAccountDelegate {
     headerIcon: ( Theme.colorScheme === Theme.LightOnDark ) ? "image://theme/github-mark-white" : "image://theme/github-mark"
 
     services: [ "Notifications"]
-    socialNetwork: SocialSync.Github
+    /*
+     * FIXME: should correspond to enum at https://github.com/sailfishos/libsocialcache/blob/e59e66214d174d699ab2fa3e41976add83da9e7e/src/lib/socialsyncinterface.h#L32
+     * socialsyncinterface.h
+     * ^^^ this ends at 8
+     * 9 is Mastodon: https://github.com/sailfishos/sailfish-account-mastodon/blob/e110ae0c4bbf9a0cee79d6faa7618d97f8da1339/eventsview-plugins/eventsview-plugin-mastodon/mastodon-delegate.qml#L23
+     * lets claim 10
+    */
+    // socialNetwork: SocialSync.GitHub
+    socialNetwork: 10
     dataType: SocialSync.Notifications
 
     model: GitHubNotificationsModel {}
