@@ -18,7 +18,7 @@ AccountCreationAgent {
     property string _existingUserName
 
     readonly property string apiUri: "https://api.github.com/user"
-    reqdonly property string apiVersion: "2022-11-28"
+    readonly property string apiVersion: "2022-11-28"
 
     function _handleAccountCreated(accountId, responseData) {
         var props = {
