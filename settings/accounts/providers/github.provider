@@ -23,7 +23,7 @@
                     <setting name="TokenPath">/login/oauth/access_token</setting>
                     <setting name="ResponseType">code</setting>
                     <setting name="Scope" type="as">["notifications"]</setting>
-                    <setting name="RedirectUri">http://ipv4.jolla.com/online/status.html</setting>
+                    <setting name="RedirectUri">https://api.github.com/user</setting>
                 </group>
             </group>
         </group>

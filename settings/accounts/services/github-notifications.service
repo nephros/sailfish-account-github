@@ -24,7 +24,10 @@
                     <setting name="TokenPath">/login/oauth/access_token</setting>
                     <setting name="ResponseType">code</setting>
                     <setting name="Scope" type="as">["notifications"]</setting>
+                    <!-- FIXME: this needs to match what has been set up with the ClientId/Secret
                     <setting name="RedirectUri">http://ipv4.jolla.com/online/status.html</setting>
+                    -->
+                    <setting name="RedirectUri">https://api.github.com/user</setting>
                 </group>
             </group>
         </group>
