@@ -122,7 +122,7 @@ void SocialNetworkSyncAdaptor::abortSync(Sync::SyncStatus status)
  */
 bool SocialNetworkSyncAdaptor::checkAccount(Accounts::Account *account)
 {
-    bool globallyEnabled = account->enabled();
+    bool globallyEnabled = account->isEnabled();
     Accounts::Service srv(m_accountManager->service(syncServiceName()));
     if (!srv.isValid()) {
         qCInfo(lcSocialPlugin) << "invalid service" << syncServiceName() << "specified, account" << account->id()
@@ -130,7 +130,7 @@ bool SocialNetworkSyncAdaptor::checkAccount(Accounts::Account *account)
         return false;
     }
     account->selectService(srv);
-    bool serviceEnabled = account->enabled();
+    bool serviceEnabled = account->isEnabled();
     account->selectService(Accounts::Service());
     return globallyEnabled && serviceEnabled;
 }
