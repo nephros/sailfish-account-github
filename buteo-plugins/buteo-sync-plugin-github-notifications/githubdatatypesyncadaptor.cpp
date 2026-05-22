@@ -1,17 +1,13 @@
-// SPDX-FileCopyrightText: 2026 2019 - 2023 Jolla Ltd.
-// SPDX-FileCopyrightText: 2026 2025,2026 Peter G. <sailfish@nephros.org>
-// SPDX-FileCopyrightText: 2026 2026 Jolla Mobile Ltd
+// SPDX-FileCopyrightText: 2019 - 2023 Jolla Ltd.
+// SPDX-FileCopyrightText: 2026 Jolla Mobile Ltd
+// SPDX-FileCopyrightText: 2024-2026 Peter G. <sailfish@nephros.org>
 //
-// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "githubdatatypesyncadaptor.h"
-#include "trace.h"
 
+#include <QtCore/QLoggingCategory>
 #include <QtCore/QVariantMap>
-#include <QtCore/QObject>
-#include <QtCore/QList>
-#include <QtCore/QString>
-#include <QtCore/QByteArray>
 
 //libsailfishkeyprovider
 #include <sailfishkeyprovider.h>
@@ -19,16 +15,20 @@
 // libaccounts-qt5
 #include <Accounts/Manager>
 #include <Accounts/Account>
-#include <Accounts/AccountService>
 #include <Accounts/Service>
+#include <Accounts/AccountService>
 
-//libsignon-qt
+// libsignon-qt5
+#include <SignOn/Identity>
 #include <SignOn/AuthSession>
 #include <SignOn/SessionData>
-#include <SignOn/Identity>
 
-GithubNotificationsDataTypeSyncAdaptor::GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::DataType dataType, QObject *parent)
-    : SocialNetworkSyncAdaptor("github", dataType, 0, parent), m_triedLoading(false)
+Q_LOGGING_CATEGORY(lcGithubNotificationsSync, "buteo.plugin.github.notifications.sync", QtWarningMsg)
+
+GithubNotificationsDataTypeSyncAdaptor::GithubNotificationsDataTypeSyncAdaptor(
+        SocialNetworkSyncAdaptor::DataType dataType,
+        QObject *parent)
+    : SocialNetworkSyncAdaptor(QStringLiteral("github"), dataType, 0, parent)
 {
 }
 
@@ -39,38 +39,35 @@ GithubNotificationsDataTypeSyncAdaptor::~GithubNotificationsDataTypeSyncAdaptor(
 void GithubNotificationsDataTypeSyncAdaptor::sync(const QString &dataTypeString, int accountId)
 {
     if (dataTypeString != SocialNetworkSyncAdaptor::dataTypeName(m_dataType)) {
-        qCWarning(lcSocialPlugin) << "Github" << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) <<
+        qCWarning(lcGithubNotificationsSync) << "Github" << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) <<
                           "sync adaptor was asked to sync" << dataTypeString;
         setStatus(SocialNetworkSyncAdaptor::Error);
         return;
     }
 
     if (clientId().isEmpty()) {
-        qCWarning(lcSocialPlugin) << "clientId could not be retrieved for GitHub account" << accountId;
+        qCWarning(lcGithubNotificationsSync) << "clientId could not be retrieved for GitHub account" << accountId;
         setStatus(SocialNetworkSyncAdaptor::Error);
         return;
     }
 
     setStatus(SocialNetworkSyncAdaptor::Busy);
     updateDataForAccount(accountId);
-    qCDebug(lcSocialPlugin) << "successfully triggered sync with profile:" << m_accountSyncProfile->name();
+    qCDebug(lcGithubNotificationsSync) << "successfully triggered sync with profile:" << m_accountSyncProfile->name();
 }
 
 void GithubNotificationsDataTypeSyncAdaptor::updateDataForAccount(int accountId)
 {
-        Accounts::Account *account = Accounts::Account::fromId(m_accountManager, accountId, this);
-        if (!account) {
-                qCWarning(lcSocialPlugin) << "existing account with id" << accountId << "couldn't be retrieved";
-                setStatus(SocialNetworkSyncAdaptor::Error);
-                decrementSemaphore(accountId);
-                return;
-        }
+    Accounts::Account *account = Accounts::Account::fromId(m_accountManager, accountId, this);
+    if (!account) {
+        qCWarning(lcGithubNotificationsSync) << "existing account with id" << accountId << "couldn't be retrieved";
+        setStatus(SocialNetworkSyncAdaptor::Error);
+        return;
+    }
 
-        // will be decremented by either signOnError or signOnResponse.
-        incrementSemaphore(accountId);
-        signIn(account);
+    incrementSemaphore(accountId);
+    signIn(account);
 }
-
 
 void GithubNotificationsDataTypeSyncAdaptor::errorHandler(QNetworkReply::NetworkError err)
 {
@@ -79,7 +76,7 @@ void GithubNotificationsDataTypeSyncAdaptor::errorHandler(QNetworkReply::Network
         int accountId = reply->property("accountId").toInt();
         QString accessToken = reply->property("accessToken").toString();
 
-        qCWarning(lcSocialPlugin) << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) <<
+        qCWarning(lcGithubNotificationsSync) << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) <<
                 "request with account" << accountId <<
                 "experienced error:" << err <<
                 "HTTP:" << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
@@ -94,17 +91,7 @@ void GithubNotificationsDataTypeSyncAdaptor::errorHandler(QNetworkReply::Network
         // ... actually we might want to use HTTP status instead of parsing the response...
 
         QString errorMessage = parsed.value("message").toString();
-        qCWarning(lcSocialPlugin) << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) << "reply message was: " << errorMessage ;
-        //QJsonObject errorReply = parsed.value("message").toObject();
-        //// Password Changed on server side
-        //if (errorReply.value("code").toDouble() == 190 &&
-        //        errorReply.value("error_subcode").toDouble() == 460) {
-        //    int accountId = reply->property("accountId").toInt();
-        //    Accounts::Account *account = Accounts::Account::fromId(m_accountManager, accountId, this);
-        //    if (account) {
-        //        setCredentialsNeedUpdate(account);
-        //    }
-        //}
+        qCWarning(lcGithubNotificationsSync) << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) << "reply message was: " << errorMessage ;
     }
 }
 
@@ -117,7 +104,7 @@ void GithubNotificationsDataTypeSyncAdaptor::sslErrorsHandler(const QList<QSslEr
     if (errs.size() > 0) {
         sslerrs.chop(2);
     }
-    qCWarning(lcSocialPlugin) << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) <<
+    qCWarning(lcGithubNotificationsSync) << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) <<
                       "request with account" << sender()->property("accountId").toInt() <<
                       "experienced ssl errors:" << sslerrs;
     // set "isError" on the reply so that adapters know to ignore the result in the finished() handler
@@ -173,7 +160,7 @@ void GithubNotificationsDataTypeSyncAdaptor::loadClientIdAndSecret()
 
 void GithubNotificationsDataTypeSyncAdaptor::setCredentialsNeedUpdate(Accounts::Account *account)
 {
-    qCInfo(lcSocialPlugin) << "sociald:Github: setting CredentialsNeedUpdate to true for account:" << account->id();
+    qCInfo(lcGithubNotificationsSync) << "sociald:Github: setting CredentialsNeedUpdate to true for account:" << account->id();
     Accounts::Service srv(m_accountManager->service(syncServiceName()));
     account->selectService(srv);
     account->setValue(QStringLiteral("CredentialsNeedUpdate"), QVariant::fromValue<bool>(true));
@@ -184,19 +171,17 @@ void GithubNotificationsDataTypeSyncAdaptor::setCredentialsNeedUpdate(Accounts::
 
 void GithubNotificationsDataTypeSyncAdaptor::signIn(Accounts::Account *account)
 {
-    // Fetch clientId from keyprovider
-    int accountId = account->id();
+    const int accountId = account->id();
     if (!checkAccount(account) || clientId().isEmpty() || clientSecret().isEmpty()) {
         decrementSemaphore(accountId);
         return;
     }
 
-    // grab out a valid identity for the sync service.
     Accounts::Service srv(m_accountManager->service(syncServiceName()));
     account->selectService(srv);
     SignOn::Identity *identity = account->credentialsId() > 0 ? SignOn::Identity::existingIdentity(account->credentialsId()) : 0;
     if (!identity) {
-        qCWarning(lcSocialPlugin) << "error: account has no valid credentials, cannot sign in:" << accountId;
+        qCWarning(lcGithubNotificationsSync) << "error: account has no valid credentials, cannot sign in:" << accountId;
         decrementSemaphore(accountId);
         return;
     }
@@ -206,7 +191,7 @@ void GithubNotificationsDataTypeSyncAdaptor::signIn(Accounts::Account *account)
     QString mechanism = accSrv.authData().mechanism();
     SignOn::AuthSession *session = identity->createSession(method);
     if (!session) {
-        qCWarning(lcSocialPlugin) << "error: could not create signon session for account:" << accountId;
+        qCWarning(lcGithubNotificationsSync) << "error: could not create signon session for account:" << accountId;
         identity->deleteLater();
         decrementSemaphore(accountId);
         return;
@@ -235,7 +220,7 @@ void GithubNotificationsDataTypeSyncAdaptor::signOnError(const SignOn::Error &er
     Accounts::Account *account = session->property("account").value<Accounts::Account*>();
     SignOn::Identity *identity = session->property("identity").value<SignOn::Identity*>();
     int accountId = account->id();
-    qCWarning(lcSocialPlugin) << "credentials for account with id" << accountId <<
+    qCWarning(lcGithubNotificationsSync) << "credentials for account with id" << accountId <<
                       "couldn't be retrieved:" << error.type() << "," << error.message();
 
     // if the error is because credentials have expired, we
@@ -265,12 +250,12 @@ void GithubNotificationsDataTypeSyncAdaptor::signOnResponse(const SignOn::Sessio
     SignOn::AuthSession *session = qobject_cast<SignOn::AuthSession*>(sender());
     Accounts::Account *account = session->property("account").value<Accounts::Account*>();
     SignOn::Identity *identity = session->property("identity").value<SignOn::Identity*>();
-    int accountId = account->id();
+    const int accountId = account->id();
 
     if (data.contains(QLatin1String("AccessToken"))) {
         accessToken = data.value(QLatin1String("AccessToken")).toString();
     } else {
-        qCInfo(lcSocialPlugin) << "signon response for account with id" << accountId << "contained no oauth token";
+        qCInfo(lcGithubNotificationsSync) << "signon response for account with id" << accountId << "contained no oauth token";
     }
 
     session->disconnect(this);
@@ -279,7 +264,9 @@ void GithubNotificationsDataTypeSyncAdaptor::signOnResponse(const SignOn::Sessio
     account->deleteLater();
 
     if (!accessToken.isEmpty()) {
-        beginSync(accountId, accessToken); // call the derived-class sync entrypoint.
+        beginSync(accountId, accessToken);
+    } else {
+        setStatus(SocialNetworkSyncAdaptor::Error);
     }
 
     decrementSemaphore(accountId);

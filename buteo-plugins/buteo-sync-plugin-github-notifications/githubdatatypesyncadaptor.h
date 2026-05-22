@@ -1,13 +1,13 @@
 /*
- * SPDX-FileCopyrightText: 2026 2019 - 2023 Jolla Ltd.
- * SPDX-FileCopyrightText: 2026 2025,2026 Peter G. <sailfish@nephros.org>
+ * SPDX-FileCopyrightText: 2019 - 2023 Jolla Ltd.
+ * SPDX-FileCopyrightText: 2026 Jolla Mobile Ltd
  * SPDX-FileCopyrightText: 2026 2026 Jolla Mobile Ltd
  *
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifndef GITHUBDATATYPESYNCADAPTOR_H
-#define GITHUBDATATYPESYNCADAPTOR_H
+#ifndef GITHUBNOTIFICATIONSDATATYPESYNCADAPTOR_H
+#define GITHUBNOTIFICATIONSDATATYPESYNCADAPTOR_H
 
 #include "socialnetworksyncadaptor.h"
 
@@ -38,7 +38,9 @@ public:
 protected:
     QString clientId();
     QString clientSecret();
+
     virtual void updateDataForAccount(int accountId);
+    virtual QString authServiceName() const;
     virtual void beginSync(int accountId, const QString &accessToken) = 0;
 
 protected Q_SLOTS:
@@ -50,12 +52,14 @@ private Q_SLOTS:
     void signOnResponse(const SignOn::SessionData &responseData);
 
 private:
-    void loadClientIdAndSecret();
     void setCredentialsNeedUpdate(Accounts::Account *account);
     void signIn(Accounts::Account *account);
+
+    void loadClientIdAndSecret();
     bool m_triedLoading; // Is true if we tried to load (even if we failed)
+
     QString m_clientId;
     QString m_clientSecret;
 };
 
-#endif // GITHUBDATATYPESYNCADAPTOR_H
+#endif // GITHUBNOTIFICATIONSDATATYPESYNCADAPTOR_H
