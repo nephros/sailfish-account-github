@@ -13,6 +13,9 @@ AccountCredentialsAgent {
     id: root
 
     property bool _started
+    function _valueFromServiceConfig(config, key) {
+        return config && config[key] ? config[key].toString() : ""
+    }
     function _startUpdate() {
         if (_started || initialPage.status !== PageStatus.Active || account.status !== Account.Initialized) {
             return
