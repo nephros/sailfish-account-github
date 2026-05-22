@@ -48,7 +48,7 @@ AccountCreationAgent {
     }
 
     initialPage: AccountCreationLegaleseDialog {
-        //: The text explaining how user's data will be backed up to GitHub
+        //: The text explaining acceptance of GitHub TOS is required.
         //% "Adding a GitHub account on your device means that you agree to GitHub's Terms of Service."
         legaleseText: qsTrId("jolla_settings_accounts_extensions-la-github-consent_text")
 
