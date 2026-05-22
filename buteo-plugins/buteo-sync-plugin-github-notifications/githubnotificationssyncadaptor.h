@@ -38,7 +38,7 @@ private:
     void setLastSuccessfulSyncTime(int accountId);
 
 private Q_SLOTS:
-    void finishedHandler();
+    void finishedNotificationsHandler();
 
 private:
     struct NotificationData {

@@ -47,16 +47,14 @@ void GithubNotificationsSyncAdaptor::beginSync(int accountId, const QString &acc
 
 void GithubNotificationsSyncAdaptor::finalize(int accountId)
 {
-    Q_UNUSED(accountId);
     if (syncAborted()) {
         qCDebug(lcGithubNotifications) << "sync aborted, skipping finalize of Github Notifications from account:" << accountId;
     } else {
-
         m_db.sync();
         m_db.wait();
-
         setLastSuccessfulSyncTime(accountId);
     }
+    Q_UNUSED(accountId);
 }
 
 void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const QString &accessToken, const QString &until, const QString &pagingToken)
@@ -100,9 +98,8 @@ void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const Q
         reply->setProperty("accessToken", accessToken);
         connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(errorHandler(QNetworkReply::NetworkError)));
         connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(sslErrorsHandler(QList<QSslError>)));
-        connect(reply, SIGNAL(finished()), this, SLOT(finishedHandler()));
+        connect(reply, SIGNAL(finished()), this, SLOT(finishedNotificationsHandler()));
 
-        // we're requesting data.  Increment the semaphore so that we know we're still busy.
         incrementSemaphore(accountId);
         setupReplyTimeout(accountId, reply);
     } else {
@@ -110,7 +107,7 @@ void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const Q
     }
 }
 
-void GithubNotificationsSyncAdaptor::finishedHandler()
+void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     bool isError = reply->property("isError").toBool();
