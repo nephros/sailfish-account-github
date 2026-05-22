@@ -25,11 +25,6 @@ namespace SignOn {
     class SessionData;
 }
 
-/*
-    Abstract interface for all of the data-specific sync adaptors
-    which pull data from the Github social network.
-*/
-
 class GithubNotificationsDataTypeSyncAdaptor : public SocialNetworkSyncAdaptor
 {
     Q_OBJECT
