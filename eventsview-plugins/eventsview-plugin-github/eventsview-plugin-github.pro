@@ -35,7 +35,7 @@ PRE_TARGETDEPS += ts engineering_english
 
 INSTALLS += ts_install engineering_english_install
 
-qml.files = github-delegate.qml GithubFeedItem.qml
+qml.files = github-delegate.qml GitHubFeedItem.qml
 qml.path = /usr/share/lipstick/eventfeed/
 
 OTHER_FILES += $$qml.files

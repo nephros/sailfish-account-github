@@ -24,7 +24,7 @@ SocialMediaAccountDelegate {
 
     model: GithubNotificationsModel {}
 
-    delegate: GithubFeedItem {
+    delegate: GitHubFeedItem {
         accountId: model.accounts[0]
         userRemovable: true
         animateRemoval: defaultAnimateRemoval || delegateItem.removeAllInProgress
