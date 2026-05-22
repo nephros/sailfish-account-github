@@ -30,6 +30,7 @@ As long as this is not included in the main distribution, to test this you will 
   - Client Secret
   - Redirect Uri
 - on your device, create a user-specific `storedkeys.ini` as described in https://github.com/nephros/sfos-github-integration/issues/3
+- if you did not build and install an RPM, add the user to the `account-github` group
 - maybe update provider and service .xml files with the correct Redirect URI
 
 While deprecated, some of the hints at https://github.com/nephros/sfos-github-integration may still apply.
