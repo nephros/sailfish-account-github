@@ -7,13 +7,16 @@
 #include "githubnotificationssyncadaptor.h"
 #include "trace.h"
 
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
-#include <QUrlQuery>
-#include <QDebug>
+#include <QtCore/QLoggingCategory>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 
 static const int NOTIFICATIONS_LIMIT = 30;
+
+Q_LOGGING_CATEGORY(lcGithubNotifications, "buteo.plugin.github.notifications", QtWarningMsg)
 
 GithubNotificationsSyncAdaptor::GithubNotificationsSyncAdaptor(QObject *parent)
     : GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::Notifications, parent)
@@ -46,7 +49,7 @@ void GithubNotificationsSyncAdaptor::finalize(int accountId)
 {
     Q_UNUSED(accountId);
     if (syncAborted()) {
-        qCDebug(lcSocialPlugin) << "sync aborted, skipping finalize of Github Notifications from account:" << accountId;
+        qCDebug(lcGithubNotifications) << "sync aborted, skipping finalize of Github Notifications from account:" << accountId;
     } else {
 
         m_db.sync();
@@ -75,7 +78,7 @@ void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const Q
     }
     //FIXME: format not accepted upstream...
     QString sincestr = since.toString(Qt::ISODate);
-    qCInfo(lcSocialPlugin) << "setting since to" << sincestr;
+    qCInfo(lcGithubNotifications) << "setting since to" << sincestr;
     queryItems.append(QPair<QString, QString>(QString(QLatin1String("since")), sincestr));
 
     QUrl url(QStringLiteral("https://api.github.com/notifications"));
@@ -103,7 +106,7 @@ void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const Q
         incrementSemaphore(accountId);
         setupReplyTimeout(accountId, reply);
     } else {
-        qCWarning(lcSocialPlugin) << "unable to request notifications from Github account with id" << accountId;
+        qCWarning(lcGithubNotifications) << "unable to request notifications from Github account with id" << accountId;
     }
 }
 
@@ -129,7 +132,7 @@ void GithubNotificationsSyncAdaptor::finishedHandler()
                 // NB: the spec has this as a string! Also, conversion from JSON->String->UInt is very finicky.
                 quint32 tid      = object.value(QStringLiteral("id")).toString().toULong();
                 if (tid == 0) {
-                        qCWarning(lcSocialPlugin) << "Error: id is zero, (wither not a number or conversion failed) skipping entry.";
+                        qCWarning(lcGithubNotifications) << "Error: id is zero, (wither not a number or conversion failed) skipping entry.";
                         continue;
                 }
                 // repo data:
@@ -157,8 +160,6 @@ void GithubNotificationsSyncAdaptor::finishedHandler()
                 bool unread    = object.value(QStringLiteral("unread")).toBool();
                 QDateTime updated = QDateTime::fromString(object.value(QStringLiteral("updated_at")).toString(), Qt::ISODate);
 
-                qCDebug(lcSocialPluginTrace) << "Adding Github notification:" << accountId << tid << from << title;
-
                 m_db.addGithubNotification(accountId,
                                            tid,
                                            type,
@@ -171,14 +172,14 @@ void GithubNotificationsSyncAdaptor::finishedHandler()
                                            url,
                                            updated);
             } else {
-                qCDebug(lcSocialPlugin) << "notification object empty; skipping";
+                qCDebug(lcGithubNotifications) << "notification object empty; skipping";
             }
         }
         m_db.sync();
         m_db.wait();
     } else {
         // error occurred during request.
-        qCWarning(lcSocialPlugin) << "error: unable to parse notification data from request with account:" << accountId <<
+        qCWarning(lcGithubNotifications) << "error: unable to parse notification data from request with account:" << accountId <<
                           "got:" << QString::fromUtf8(replyData);
     }
 
