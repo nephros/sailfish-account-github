@@ -7,8 +7,8 @@ TEMPLATE = aux
 
 QT += qml
 
-TS_FILE = $$OUT_PWD/lipstick-jolla-home-mastodon.ts
-EE_QM = $$OUT_PWD/lipstick-jolla-home-mastodon_eng_en.qm
+TS_FILE = $$OUT_PWD/lipstick-jolla-home-github.ts
+EE_QM = $$OUT_PWD/lipstick-jolla-home-github_eng_en.qm
 
 ts.commands += lupdate $$PWD -ts $$TS_FILE
 ts.CONFIG += no_check_exist no_link

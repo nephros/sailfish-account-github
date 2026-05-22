@@ -18,7 +18,7 @@ AccountCredentialsAgent {
             return
         }
 
-        var config = account.configurationValues("mastodon-notifications")
+        var config = account.configurationValues("github-notifications")
         var apiHost = _valueFromServiceConfig(config, "api/Host")
         var oauthHost = _valueFromServiceConfig(config, "auth/oauth2/web_server/Host")
         var clientId = _valueFromServiceConfig(config, "auth/oauth2/web_server/ClientId")
