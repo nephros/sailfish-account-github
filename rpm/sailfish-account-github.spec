@@ -100,7 +100,7 @@ fi
 %license LICENSES/BSD-3-Clause.txt
 %license LICENSES/LGPL-2.1-or-later.txt
 %{_libdir}/libgithubcommon.so.*
-%exclude %%{_libdir}/libgithubcommon.so
+%exclude %{_libdir}/libgithubcommon.so
 %{_libdir}/libgithubbuteocommon.so.*
 %exclude %{_libdir}/libgithubbuteocommon.so
 %{_datadir}/accounts/providers/github.provider
