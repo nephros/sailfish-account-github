@@ -18,7 +18,6 @@ static const int NOTIFICATIONS_LIMIT = 30;
 GithubNotificationsSyncAdaptor::GithubNotificationsSyncAdaptor(QObject *parent)
     : GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::Notifications, parent)
 {
-    //setInitialActive(true);
     setInitialActive(m_db.isValid());
 }
 
@@ -28,7 +27,7 @@ GithubNotificationsSyncAdaptor::~GithubNotificationsSyncAdaptor()
 
 QString GithubNotificationsSyncAdaptor::syncServiceName() const
 {
-    return QStringLiteral("github-posts");
+    return QStringLiteral("github-notifications");
 }
 
 void GithubNotificationsSyncAdaptor::purgeDataForOldAccount(int oldId, SocialNetworkSyncAdaptor::PurgeMode)
