@@ -6,13 +6,14 @@
 
 TEMPLATE = subdirs
 SUBDIRS += \
+    common \
     settings \
     buteo-plugins \
     icons \
     eventsview-plugins
 
-# buteo-plugins.depends = common
+buteo-plugins.depends = common
 # transferengine-plugins.depends = common
-# eventsview-plugins.depends = common
+eventsview-plugins.depends = common
 
 OTHER_FILES += rpm/sailfish-account-github.spec
