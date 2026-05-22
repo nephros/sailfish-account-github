@@ -1,4 +1,3 @@
-// SPDX-FileCopyrightText: 2019 - 2023 Jolla Ltd.
 // SPDX-FileCopyrightText: 2026 Jolla Mobile Ltd
 // SPDX-FileCopyrightText: 2025,2026 Peter G. <sailfish@nephros.org>
 //
@@ -20,6 +19,7 @@ StandardAccountSettingsDisplay {
 
     StandardAccountSettingsLoader {
         id: settingsLoader
+
         account: root.account
         accountProvider: root.accountProvider
         accountManager: root.accountManager
@@ -40,6 +40,7 @@ StandardAccountSettingsDisplay {
 
     Column {
         id: syncServicesDisplay
+
         width: parent.width
 
         SectionHeader {
@@ -49,7 +50,6 @@ StandardAccountSettingsDisplay {
         Repeater {
             id: syncServicesRepeater
             IconTextSwitch {
-                id: serviceSwitch
                 checked: model.enabled
                 text: model.displayName
                 icon.source: model.iconName
@@ -69,8 +69,8 @@ StandardAccountSettingsDisplay {
     /*
     AccountServiceSettingsDisplay {
         id: otherServicesDisplay
-        enabled: root.accountEnabled
 
+        enabled: root.accountEnabled
         onUpdateServiceEnabledStatus: {
             if (enabled) {
                 root.account.enableWithService(serviceName)
