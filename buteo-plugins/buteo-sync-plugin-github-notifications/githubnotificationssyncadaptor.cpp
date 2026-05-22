@@ -15,35 +15,35 @@
 
 static const int NOTIFICATIONS_LIMIT = 30;
 
-GithubNotificationSyncAdaptor::GithubNotificationSyncAdaptor(QObject *parent)
+GithubNotificationsSyncAdaptor::GithubNotificationsSyncAdaptor(QObject *parent)
     : GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::Notifications, parent)
 {
     //setInitialActive(true);
     setInitialActive(m_db.isValid());
 }
 
-GithubNotificationSyncAdaptor::~GithubNotificationSyncAdaptor()
+GithubNotificationsSyncAdaptor::~GithubNotificationsSyncAdaptor()
 {
 }
 
-QString GithubNotificationSyncAdaptor::syncServiceName() const
+QString GithubNotificationsSyncAdaptor::syncServiceName() const
 {
     return QStringLiteral("github-posts");
 }
 
-void GithubNotificationSyncAdaptor::purgeDataForOldAccount(int oldId, SocialNetworkSyncAdaptor::PurgeMode)
+void GithubNotificationsSyncAdaptor::purgeDataForOldAccount(int oldId, SocialNetworkSyncAdaptor::PurgeMode)
 {
     m_db.removeNotifications(oldId);
     m_db.sync();
     m_db.wait();
 }
 
-void GithubNotificationSyncAdaptor::beginSync(int accountId, const QString &accessToken)
+void GithubNotificationsSyncAdaptor::beginSync(int accountId, const QString &accessToken)
 {
     requestNotifications(accountId, accessToken);
 }
 
-void GithubNotificationSyncAdaptor::finalize(int accountId)
+void GithubNotificationsSyncAdaptor::finalize(int accountId)
 {
     Q_UNUSED(accountId);
     if (syncAborted()) {
@@ -57,7 +57,7 @@ void GithubNotificationSyncAdaptor::finalize(int accountId)
     }
 }
 
-void GithubNotificationSyncAdaptor::requestNotifications(int accountId, const QString &accessToken, const QString &until, const QString &pagingToken)
+void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const QString &accessToken, const QString &until, const QString &pagingToken)
 {
     // TODO: result paging
     Q_UNUSED(until);
@@ -108,7 +108,7 @@ void GithubNotificationSyncAdaptor::requestNotifications(int accountId, const QS
     }
 }
 
-void GithubNotificationSyncAdaptor::finishedHandler()
+void GithubNotificationsSyncAdaptor::finishedHandler()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     bool isError = reply->property("isError").toBool();
@@ -185,7 +185,7 @@ void GithubNotificationSyncAdaptor::finishedHandler()
 
 }
 
-QDateTime GithubNotificationSyncAdaptor::lastSuccessfulSyncTime(int accountId)
+QDateTime GithubNotificationsSyncAdaptor::lastSuccessfulSyncTime(int accountId)
 {
     QDateTime result;
     QString settingsFileName = QString::fromLatin1("%1/%2/ghnotif.ini")
@@ -199,7 +199,7 @@ QDateTime GithubNotificationSyncAdaptor::lastSuccessfulSyncTime(int accountId)
     return result;
 }
 
-void GithubNotificationSyncAdaptor::setLastSuccessfulSyncTime(int accountId)
+void GithubNotificationsSyncAdaptor::setLastSuccessfulSyncTime(int accountId)
 {
     QDateTime currentTime = QDateTime::currentDateTime().toUTC();
     QString settingsFileName = QString::fromLatin1("%1/%2/ghnotif.ini")

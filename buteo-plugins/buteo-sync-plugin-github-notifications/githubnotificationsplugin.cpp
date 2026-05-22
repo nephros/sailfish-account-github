@@ -23,7 +23,7 @@ GithubNotificationsPlugin::~GithubNotificationsPlugin()
 
 SocialNetworkSyncAdaptor *GithubNotificationsPlugin::createSocialNetworkSyncAdaptor()
 {
-    return new GithubNotificationSyncAdaptor(this);
+    return new GithubNotificationsSyncAdaptor(this);
 }
 
 Buteo::ClientPlugin* GithubNotificationsPluginLoader::createClientPlugin(

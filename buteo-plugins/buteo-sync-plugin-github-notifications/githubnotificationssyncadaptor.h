@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2026 2019 - 2023 Jolla Ltd.
- * SPDX-FileCopyrightText: 2026 2025,2026 Peter G. <sailfish@nephros.org>
- * SPDX-FileCopyrightText: 2026 2026 Jolla Mobile Ltd
+ * SPDX-FileCopyrightText: 2019 - 2023 Jolla Ltd.
+ * SPDX-FileCopyrightText: 2026 Jolla Mobile Ltd
+ * SPDX-FileCopyrightText: 2024-2026 Peter G. <sailfish@nephros.org>
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -12,25 +12,24 @@
 #include "githubdatatypesyncadaptor.h"
 #include <githubnotificationsdatabase.h>
 
-#include <QList>
-#include <QJsonObject>
 
 class Notification;
 
-class GithubNotificationSyncAdaptor : public GithubNotificationsDataTypeSyncAdaptor
+class GithubNotificationsSyncAdaptor : public GithubNotificationsDataTypeSyncAdaptor
 {
     Q_OBJECT
 
 public:
-    GithubNotificationSyncAdaptor(QObject *parent);
-    ~GithubNotificationSyncAdaptor();
+    GithubNotificationsSyncAdaptor(QObject *parent);
+    ~GithubNotificationsSyncAdaptor();
 
     QString syncServiceName() const;
 
-protected: // implementing GithubNotificationsDataTypeSyncAdaptor interface
-    void purgeDataForOldAccount(int oldId, SocialNetworkSyncAdaptor::PurgeMode mode);
-    void beginSync(int accountId, const QString &accessToken);
-    void finalize(int accountId);
+protected:
+    QString authServiceName() const override;
+    void purgeDataForOldAccount(int oldId, SocialNetworkSyncAdaptor::PurgeMode mode) override;
+    void beginSync(int accountId, const QString &accessToken) override;
+    void finalize(int accountId) override;
 
 private:
     void requestNotifications(int accountId, const QString &accessToken,
@@ -43,7 +42,6 @@ private Q_SLOTS:
     void finishedHandler();
 
 private:
-    //void saveGithubNotificationFromObject(int accountId, const QJsonObject &notif);
     struct NotificationData {
         NotificationData() : accountId(0) {}
         NotificationData(int accountId, const QJsonObject &notification)
