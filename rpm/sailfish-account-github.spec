@@ -26,7 +26,7 @@ BuildRequires: pkgconfig(accounts-qt5)
 BuildRequires: pkgconfig(libsignon-qt5)
 BuildRequires: pkgconfig(socialcache)
 BuildRequires: pkgconfig(libsailfishkeyprovider)
-BuildRequires: pkgconfig(sailfishaccounts)
+#BuildRequires: pkgconfig(sailfishaccounts)
 BuildRequires: pkgconfig(nemonotifications-qt5)
 Requires: jolla-settings-accounts-extensions-onlinesync
 Requires: buteo-syncfw-qt5-msyncd
