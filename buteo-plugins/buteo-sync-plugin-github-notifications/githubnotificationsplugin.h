@@ -1,9 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2026 2019 - 2023 Jolla Ltd.
+ * SPDX-FileCopyrightText: 2019 - 2023 Jolla Ltd.
+ * SPDX-FileCopyrightText: 2026 Jolla Mobile Ltd
  * SPDX-FileCopyrightText: 2026 2025,2026 Peter G. <sailfish@nephros.org>
- * SPDX-FileCopyrightText: 2026 2026 Jolla Mobile Ltd
  *
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #ifndef GITHUBNOTIFICATIONSPLUGIN_H
@@ -19,12 +19,12 @@ class Q_DECL_EXPORT GithubNotificationsPlugin : public SocialdButeoPlugin
 
 public:
     GithubNotificationsPlugin(const QString& pluginName,
-                  const Buteo::SyncProfile& profile,
-                  Buteo::PluginCbInterface *cbInterface);
+                              const Buteo::SyncProfile& profile,
+                              Buteo::PluginCbInterface *cbInterface);
     ~GithubNotificationsPlugin();
 
 protected:
-    SocialNetworkSyncAdaptor *createSocialNetworkSyncAdaptor();
+    SocialNetworkSyncAdaptor *createSocialNetworkSyncAdaptor() override;
 };
 
 
