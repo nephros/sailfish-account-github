@@ -162,7 +162,13 @@ AccountCreationAgent {
                     "ClientId": keyProvider.storedKey("github", "", "client_id"),
                     "ClientSecret": keyProvider.storedKey("github", "", "client_secret")
                 }
-                console.debug("trying to set up:", JSON.stringify(sessionData))
+
+                if ((sessionData["ClientId"] == "") || (sessionData["ClientSecret"] == "")) {
+                    //% "This installation contains no API secrets, can not continue."
+                    root.accountCreationError(qsTrId("jolla_settings_accounts_extensions-bt-github_error_nosecrets"));
+                    return
+                }
+
                 prepareAccountCreation(root.accountProvider, "github-microblogging", sessionData)
             }
             onAccountCreated: {
