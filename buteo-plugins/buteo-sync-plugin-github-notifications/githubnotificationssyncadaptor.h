@@ -26,7 +26,6 @@ public:
     QString syncServiceName() const;
 
 protected:
-    QString authServiceName() const override;
     void purgeDataForOldAccount(int oldId, SocialNetworkSyncAdaptor::PurgeMode mode) override;
     void beginSync(int accountId, const QString &accessToken) override;
     void finalize(int accountId) override;
