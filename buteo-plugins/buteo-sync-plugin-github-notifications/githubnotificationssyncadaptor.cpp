@@ -19,6 +19,8 @@
 
 #include <notification.h>
 
+#define GITHUB_API_VERSION "2022-11-28"
+
 #define OPEN_URL_ACTION(openUrl)            \
     Notification::remoteAction(             \
         "default",                          \
@@ -67,7 +69,7 @@ namespace {
 GithubNotificationsSyncAdaptor::GithubNotificationsSyncAdaptor(QObject *parent)
     : GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::Notifications, parent)
 {
-    setInitialActive(m_db.isValid());
+    setInitialActive(true);
 }
 
 GithubNotificationsSyncAdaptor::~GithubNotificationsSyncAdaptor()
@@ -79,15 +81,27 @@ QString GithubNotificationsSyncAdaptor::syncServiceName() const
     return QStringLiteral("github-notifications");
 }
 
+/*
+QString MastodonNotificationsSyncAdaptor::authServiceName() const
+{
+    return QStringLiteral("mastodon-microblog");
+}
+*/
+
 void GithubNotificationsSyncAdaptor::purgeDataForOldAccount(int oldId, SocialNetworkSyncAdaptor::PurgeMode)
 {
-    m_db.removeNotifications(oldId);
-    m_db.sync();
-    m_db.wait();
+    closeAccountNotifications(oldId);
+
+    m_accessTokens.remove(oldId);
+    m_pendingSyncStates.remove(oldId);
+    m_lastMarkedReadIds.remove(oldId);
+    saveLastFetchedId(oldId, QString());
 }
 
 void GithubNotificationsSyncAdaptor::beginSync(int accountId, const QString &accessToken)
 {
+    m_accessTokens.insert(accountId, accessToken);
+    m_pendingSyncStates.remove(accountId);
     requestNotifications(accountId, accessToken);
 }
 
@@ -95,12 +109,41 @@ void GithubNotificationsSyncAdaptor::finalize(int accountId)
 {
     if (syncAborted()) {
         qCDebug(lcGithubNotifications) << "sync aborted, skipping finalize of Github Notifications from account:" << accountId;
-    } else {
-        m_db.sync();
-        m_db.wait();
-        setLastSuccessfulSyncTime(accountId);
     }
+
     Q_UNUSED(accountId);
+}
+
+/*
+QString MastodonNotificationsSyncAdaptor::sanitizeContent(const QString &content)
+{
+    return MastodonTextUtils::sanitizeContent(content);
+}
+
+QDateTime MastodonNotificationsSyncAdaptor::parseTimestamp(const QString &timestampString)
+{
+    return MastodonTextUtils::parseTimestamp(timestampString);
+}
+*/
+
+int GithubNotificationsSyncAdaptor::compareNotificationIds(const QString &left, const QString &right)
+{
+    if (left == right) {
+        return 0;
+    }
+
+    bool leftOk = false;
+    bool rightOk = false;
+    const qulonglong leftValue = left.toULongLong(&leftOk);
+    const qulonglong rightValue = right.toULongLong(&rightOk);
+    if (leftOk && rightOk) {
+        return leftValue < rightValue ? -1 : 1;
+    }
+
+    if (left.size() != right.size()) {
+        return left.size() < right.size() ? -1 : 1;
+    }
+    return left < right ? -1 : 1;
 }
 
 QString GithubNotificationsSyncAdaptor::notificationObjectKey(int accountId, const QString &notificationId)
@@ -109,28 +152,13 @@ QString GithubNotificationsSyncAdaptor::notificationObjectKey(int accountId, con
 }
 
 
-void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const QString &accessToken, const QString &until, const QString &pagingToken)
-{
-    // TODO: result paging
-    Q_UNUSED(until);
-    Q_UNUSED(pagingToken);
 
+//void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const QString &accessToken, const QString &until, const QString &pagingToken)
+void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const QString &accessToken)
+{
     QList<QPair<QString, QString> > queryItems;
-    //queryItems.append(QPair<QString, QString>(QString(QLatin1String("all")), QString(QLatin1String("false"))));
     queryItems.append(QPair<QString, QString>(QString(QLatin1String("all")), QString(QLatin1String("true"))));
     queryItems.append(QPair<QString, QString>(QString(QLatin1String("participating")), QString(QLatin1String("true"))));
-    QDateTime since = lastSuccessfulSyncTime(accountId);
-    if (!since.isValid()) {
-            int sinceSpan = m_accountSyncProfile
-                    ? m_accountSyncProfile->key(Buteo::KEY_SYNC_SINCE_DAYS_PAST, QStringLiteral("7")).toInt()
-                    : 7;
-            since = QDateTime::currentDateTime().addDays(-1 * sinceSpan).toUTC();
-    }
-    //FIXME: format not accepted upstream...
-    QString sincestr = since.toString(Qt::ISODate);
-    qCInfo(lcGithubNotifications) << "setting since to" << sincestr;
-    queryItems.append(QPair<QString, QString>(QString(QLatin1String("since")), sincestr));
-
     QUrl url(QStringLiteral("https://api.github.com/notifications"));
     QUrlQuery query(url);
     query.setQueryItems(queryItems);
@@ -140,7 +168,7 @@ void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const Q
     request.setRawHeader(QString(QLatin1String("Accept")).toUtf8(),
                     QString(QLatin1String("application/vnd.github+json")).toUtf8());
     request.setRawHeader(QString(QLatin1String("X-GitHub-Api-Version")).toUtf8(),
-                    QString(QLatin1String("2022-11-28")).toUtf8());
+                    QString(QLatin1String(GITHUB_API_VERSION)).toUtf8());
     request.setRawHeader(QString(QLatin1String("Authorization")).toUtf8(),
                     QString(QLatin1String("Bearer ")).toUtf8() + accessToken.toUtf8());
     QNetworkReply *reply = m_networkAccessManager->get(request);
@@ -156,6 +184,7 @@ void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const Q
         setupReplyTimeout(accountId, reply);
     } else {
         qCWarning(lcGithubNotifications) << "unable to request notifications from Github account with id" << accountId;
+        decrementSemaphore(accountId);
     }
 }
 
@@ -214,23 +243,33 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 bool unread    = object.value(QStringLiteral("unread")).toBool();
                 const QDateTime updated = QDateTime::fromString(object.value(QStringLiteral("updated_at")).toString(), Qt::ISODate);
 
-                m_db.addGithubNotification(accountId,
-                                           tid,
-                                           type,
-                                           title,
-                                           from,
-                                           reason,
-                                           unread,
-                                           repo,
-                                           avatar,
-                                           url,
-                                           updated);
+                PendingNotification pendingNotification;
+                pendingNotification.notificationId = tid;
+                pendingNotification.summary = reason;
+                pendingNotification.body = title;
+                pendingNotification.icon = avatar;
+                pendingNotification.link = url;
+                pendingNotification.timestamp = updated;
+                PendingSyncState state = m_pendingSyncStates.value(accountId);
+                state.pendingNotifications.insert(pendingNotification.notificationId, pendingNotification);
             } else {
                 qCDebug(lcGithubNotifications) << "notification object empty; skipping";
             }
         }
-        m_db.sync();
-        m_db.wait();
+        PendingSyncState state = m_pendingSyncStates.value(accountId);
+
+        if (state.pendingNotifications.size() > 0) {
+            QStringList notificationIds = state.pendingNotifications.keys();
+            std::sort(notificationIds.begin(), notificationIds.end(), [](const QString &left, const QString &right) {
+                return compareNotificationIds(left, right) > 0;
+            });
+
+            foreach (const QString &notificationId, notificationIds) {
+                const PendingNotification pendingNotification = state.pendingNotifications.value(notificationId);
+                publishSystemNotification(accountId, pendingNotification);
+            }
+        }
+
     } else {
         qCWarning(lcGithubNotifications) << "unable to update notifications data for account" << accountId
                                   << ", got:" << QString::fromUtf8(replyData);
@@ -302,6 +341,35 @@ void GithubNotificationsSyncAdaptor::maybeMarkAccountNotificationsRead(int accou
     requestMarkRead(accountId, accessToken, lastReadId);
 }
 
+void GithubNotificationsSyncAdaptor::markReadFromNotification(Notification *notification)
+{
+    if (!notification) {
+        return;
+    }
+
+    const int accountId = notification->hintValue("x-nemo.sociald.account-id").toInt();
+    const QString accessToken = m_accessTokens.value(accountId).trimmed();
+    if (accountId <= 0 || accessToken.isEmpty()) {
+        return;
+    }
+
+    maybeMarkAccountNotificationsRead(accountId, accessToken, notification);
+}
+
+void GithubNotificationsSyncAdaptor::removeCachedNotification(Notification *notification)
+{
+    if (!notification) {
+        return;
+    }
+
+    const int accountId = notification->hintValue("x-nemo.sociald.account-id").toInt();
+    const QString notificationId = notification->hintValue(NotificationIdHint).toString();
+    if (accountId <= 0 || notificationId.isEmpty()) {
+        return;
+    }
+
+    m_notificationObjects.remove(notificationObjectKey(accountId, notificationId));
+}
 
 Notification *GithubNotificationsSyncAdaptor::createNotification(int accountId, const QString &notificationId)
 {
@@ -321,7 +389,7 @@ Notification *GithubNotificationsSyncAdaptor::createNotification(int accountId, 
     notification->setHintValue("x-nemo.sociald.account-id", accountId);
     notification->setHintValue(NotificationIdHint, notificationId);
     notification->setHintValue("x-nemo-feedback", QStringLiteral("social"));
-    notification->setHintValue("x-nemo-priority", 100); // Show on lockscreen
+    //notification->setHintValue("x-nemo-priority", 100); // Show on lockscreen
     notification->setCategory(QLatin1String(NotificationCategory));
 
     connect(notification, SIGNAL(closed(uint)), this, SLOT(notificationClosedWithReason(uint)), Qt::UniqueConnection);
@@ -330,29 +398,3 @@ Notification *GithubNotificationsSyncAdaptor::createNotification(int accountId, 
     return notification;
 }
 
-
-QDateTime GithubNotificationsSyncAdaptor::lastSuccessfulSyncTime(int accountId)
-{
-    QDateTime result;
-    QString settingsFileName = QString::fromLatin1("%1/%2/ghnotif.ini")
-            .arg(PRIVILEGED_DATA_DIR)
-            .arg(SYNC_DATABASE_DIR);
-    QSettings settingsFile(settingsFileName, QSettings::IniFormat);
-    uint timestamp = settingsFile.value(QString::fromLatin1("%1-last-successful-sync-time").arg(accountId)).toUInt();
-    if (timestamp > 0) {
-        result = QDateTime::fromTime_t(timestamp);
-    }
-    return result;
-}
-
-void GithubNotificationsSyncAdaptor::setLastSuccessfulSyncTime(int accountId)
-{
-    QDateTime currentTime = QDateTime::currentDateTime().toUTC();
-    QString settingsFileName = QString::fromLatin1("%1/%2/ghnotif.ini")
-            .arg(PRIVILEGED_DATA_DIR)
-            .arg(SYNC_DATABASE_DIR);
-    QSettings settingsFile(settingsFileName, QSettings::IniFormat);
-    settingsFile.setValue(QString::fromLatin1("%1-last-successful-sync-time").arg(accountId),
-                          QVariant::fromValue<uint>(currentTime.toTime_t()));
-    settingsFile.sync();
-}

@@ -10,7 +10,6 @@
 #define GITHUBNOTIFICATIONSSYNCADAPTOR_H
 
 #include "githubdatatypesyncadaptor.h"
-#include <githubnotificationsdatabase.h>
 
 
 class Notification;
@@ -36,16 +35,28 @@ private:
         QString summary;
         QString body;
         QString link;
+        QString icon;
         QDateTime timestamp;
     };
 
-    void requestNotifications(int accountId, const QString &accessToken,
-                              const QString &until = QString(),
-                              const QString &pagingToken = QString());
+    struct PendingSyncState {
+        QString accessToken;
+        bool markerKnown = false;
+        QString unreadFloorId;
+        QString lastFetchedId;
+        QString maxFetchedId;
+        QSet<QString> unreadNotificationIds;
+        QHash<QString, PendingNotification> pendingNotifications;
+    };
 
     static int compareNotificationIds(const QString &left, const QString &right);
     QString loadLastFetchedId(int accountId) const;
     void saveLastFetchedId(int accountId, const QString &lastFetchedId);
+
+    void requestNotifications(int accountId,
+                              const QString &accessToken);
+//                              const QString &minId,
+//                              const QString &maxId = QString());
     void requestMarkRead(int accountId, const QString &accessToken, const QString &lastReadId);
     void publishSystemNotification(int accountId, const PendingNotification &notificationData);
     Notification *createNotification(int accountId, const QString &notificationId);
@@ -58,24 +69,17 @@ private:
     void markReadFromNotification(Notification *notification);
     void removeCachedNotification(Notification *notification);
 
-    QDateTime lastSuccessfulSyncTime(int accountId);
-    void setLastSuccessfulSyncTime(int accountId);
-
 private Q_SLOTS:
+    void finishedUnreadMarkerHandler();
     void finishedNotificationsHandler();
+    void finishedMarkReadHandler();
     void notificationClosedWithReason(uint reason);
 
 private:
-    struct NotificationData {
-        NotificationData() : accountId(0) {}
-        NotificationData(int accountId, const QJsonObject &notification)
-            : accountId(accountId), notification(notification) {}
-        int accountId;
-        QJsonObject notification;
-    };
+    QHash<int, QString> m_accessTokens;
+    QHash<int, PendingSyncState> m_pendingSyncStates;
     QHash<int, QString> m_lastMarkedReadIds;
     QHash<QString, Notification *> m_notificationObjects;
-    GithubNotificationsDatabase m_db;
 };
 
 #endif // GITHUBNOTIFICATIONSSYNCADAPTOR_H
