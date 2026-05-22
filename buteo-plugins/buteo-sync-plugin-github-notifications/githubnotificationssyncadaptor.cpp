@@ -1,8 +1,8 @@
-// SPDX-FileCopyrightText: 2026 2019 - 2023 Jolla Ltd.
+// SPDX-FileCopyrightText: 2019 - 2023 Jolla Ltd.
+// SPDX-FileCopyrightText: 2026 Jolla Mobile Ltd
 // SPDX-FileCopyrightText: 2026 2025,2026 Peter G. <sailfish@nephros.org>
-// SPDX-FileCopyrightText: 2026 2026 Jolla Mobile Ltd
 //
-// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "githubnotificationssyncadaptor.h"
 #include "trace.h"
