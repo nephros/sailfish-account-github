@@ -10,7 +10,7 @@
 #define GITHUBNOTIFICATIONSYNCADAPTOR_H
 
 #include "githubdatatypesyncadaptor.h"
-#include <socialcache/githubnotificationsdatabase.h>
+#include <githubnotificationsdatabase.h>
 
 #include <QList>
 #include <QJsonObject>
