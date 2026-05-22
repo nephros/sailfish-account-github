@@ -34,6 +34,7 @@ private:
         QString notificationId;
         QString summary;
         QString body;
+        QString subText;
         QString link;
         QString icon;
         QDateTime timestamp;

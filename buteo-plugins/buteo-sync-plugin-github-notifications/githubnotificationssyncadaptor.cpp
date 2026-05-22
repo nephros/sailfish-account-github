@@ -245,8 +245,9 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
 
                 PendingNotification pendingNotification;
                 pendingNotification.notificationId = tid;
-                pendingNotification.summary = reason;
-                pendingNotification.body = title;
+                pendingNotification.summary = QString("%1 (%2)").arg(title).arg(type);
+                pendingNotification.subText = reason;
+//                pendingNotification.body = title;
                 pendingNotification.icon = avatar;
                 pendingNotification.link = url;
                 pendingNotification.timestamp = updated;
