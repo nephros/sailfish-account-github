@@ -6,11 +6,10 @@
 
 #ifndef GITHUBNOTIFICATIONSMODEL_H
 #define GITHUBNOTIFICATIONSMODEL_H
+#include <QtCore/QAbstractListModel>
+#include <QHash>
 
-#include "abstractsocialcachemodel.h"
-
-class GithubNotificationsModelPrivate;
-class GithubNotificationsModel : public AbstractSocialCacheModel
+class GithubNotificationsModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QVariantList accountIdFilter READ accountIdFilter WRITE setAccountIdFilter NOTIFY accountIdFilterChanged)
@@ -31,7 +30,10 @@ public:
         Accounts,
     };
     explicit GithubNotificationsModel(QObject *parent = 0);
-    QHash<int, QByteArray> roleNames() const;
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
     QVariantList accountIdFilter() const;
     void setAccountIdFilter(const QVariantList &accountIds);
@@ -43,6 +45,7 @@ public:
 
 signals:
     void accountIdFilterChanged();
+    void countChanged();
 
 private Q_SLOTS:
     void notificationsChanged();
@@ -50,6 +53,8 @@ private Q_SLOTS:
 private:
     Q_DECLARE_PRIVATE(GithubNotificationsModel)
     QVariantList m_accountIdFilterStub;
+    typedef QMap<int, QVariant> RowData;
+    QList<RowData> m_data;
 };
 
 #endif // GITHUBNOTIFICATIONSMODEL_H

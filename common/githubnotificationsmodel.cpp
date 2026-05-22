@@ -5,33 +5,29 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "githubnotificationsmodel.h"
-#include "abstractsocialcachemodel_p.h"
 #include "githubnotificationsdatabase.h"
 
-class GithubNotificationsModelPrivate : public AbstractSocialCacheModelPrivate
-{
-public:
-    explicit GithubNotificationsModelPrivate(GithubNotificationsModel *q);
-
-    GithubNotificationsDatabase database;
-
-private:
-    // note CamelCase here:
-    Q_DECLARE_PUBLIC(GitHubNotificationsModel)
-};
-
-GithubNotificationsModelPrivate::GithubNotificationsModelPrivate(GithubNotificationsModel *q)
-    : AbstractSocialCacheModelPrivate(q)
-{
-}
-
 GithubNotificationsModel::GithubNotificationsModel(QObject *parent)
-    : AbstractSocialCacheModel(*(new GithubNotificationsModelPrivate(this)), parent)
+    : QAbstractListModel(parent)
 {
-    Q_D(GithubNotificationsModel);
-
     connect(&d->database, SIGNAL(notificationsChanged()), this, SLOT(notificationsChanged()));
     connect(&d->database, SIGNAL(accountIdFilterChanged()), this, SIGNAL(accountIdFilterChanged()));
+}
+
+int GithubNotificationsModel::rowCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent)
+    return m_data.count();
+}
+
+QVariant GithubNotificationsModel::data(const QModelIndex &index, int role) const
+{
+    const int row = index.row();
+    if (!index.isValid() || row < 0 || row >= m_data.count()) {
+        return QVariant();
+    }
+
+    return m_data.at(row).value(role);
 }
 
 QHash<int, QByteArray> GithubNotificationsModel::roleNames() const
@@ -53,15 +49,11 @@ QHash<int, QByteArray> GithubNotificationsModel::roleNames() const
 
 QVariantList GithubNotificationsModel::accountIdFilter() const
 {
-    Q_D(const GithubNotificationsModel);
-
     return d->database.accountIdFilter();
 }
 
 void GithubNotificationsModel::setAccountIdFilter(const QVariantList &accountIds)
 {
-    Q_D(GithubNotificationsModel);
-
     d->database.setAccountIdFilter(accountIds);
 }
 
@@ -72,7 +64,6 @@ void GithubNotificationsModel::refresh()
 
 void GithubNotificationsModel::remove(const QString &notificationId)
 {
-    Q_D(GithubNotificationsModel);
     for (int i=0; i<count(); i++) {
         if (getField(i, GithubNotificationsModel::NotificationId).toString() == notificationId) {
             d->removeRange(i, 1);
@@ -85,15 +76,12 @@ void GithubNotificationsModel::remove(const QString &notificationId)
 
 void GithubNotificationsModel::clear()
 {
-    Q_D(GithubNotificationsModel);
     d->clearData();
     d->database.removeAllNotifications();
 }
 
 void GithubNotificationsModel::notificationsChanged()
 {
-    Q_D(GithubNotificationsModel);
-
     SocialCacheModelData data;
     QList<GithubNotification::ConstPtr> notificationsData = d->database.notifications();
     Q_FOREACH (const GithubNotification::ConstPtr &notification, notificationsData) {
