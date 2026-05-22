@@ -8,7 +8,7 @@
 <provider version="1.0" id="github">
     <translations>/usr/share/translations/settings-accounts-github</translations>
     <name>GitHub</name>
-    <description>MS GitHub account provider</description>
+    <description>GitHub account provider</description>
     <icon>image://theme/github-mark-white</icon>
 
     <template>

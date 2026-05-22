@@ -49,11 +49,18 @@ StandardAccountSettingsDisplay {
 
         Repeater {
             id: syncServicesRepeater
+
             IconTextSwitch {
                 checked: model.enabled
-                text: model.displayName
                 icon.source: model.iconName
-                description: model.description
+                text: model.serviceName === "github-notifications"
+                           ? //% "Notifications"
+                             qsTrId("settings-accounts-github-la-service_notifications")
+                           : model.displayName
+                description: model.serviceName === "github-notifications"
+                           ? //% "Show GitHub notifications."
+                             qsTrId("settings-accounts-github-la-service_notifications_description")
+                           : ""
                 visible: text.length > 0
                 onCheckedChanged: {
                     if (checked) {
