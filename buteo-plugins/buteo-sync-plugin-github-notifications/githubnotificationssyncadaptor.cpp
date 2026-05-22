@@ -110,21 +110,26 @@ void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const Q
 void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    bool isError = reply->property("isError").toBool();
-    int accountId = reply->property("accountId").toInt();
-    QByteArray replyData = reply->readAll();
+    if (!reply) {
+        return;
+    }
+
+    const bool isError = reply->property("isError").toBool();
+    const int accountId = reply->property("accountId").toInt();
+    const QByteArray replyData = reply->readAll();
+
     disconnect(reply);
     reply->deleteLater();
     removeReplyTimeout(accountId, reply);
 
     bool ok = false;
-    QJsonArray data = parseJsonArrayReplyData(replyData, &ok);
+    const QJsonArray data = parseJsonArrayReplyData(replyData, &ok);
 
     // https://docs.github.com/en/rest/activity/notifications?apiVersion=2022-11-28
     if (!isError && ok && data.count() > 0) {
 
         foreach (const QJsonValue &entry, data) {
-            QJsonObject object = entry.toObject();
+            const QJsonObject object = entry.toObject();
             if (!object.isEmpty()) {
                 // NB: the spec has this as a string! Also, conversion from JSON->String->UInt is very finicky.
                 quint32 tid      = object.value(QStringLiteral("id")).toString().toULong();
@@ -133,17 +138,17 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                         continue;
                 }
                 // repo data:
-                QJsonObject r    = object.value(QStringLiteral("repository")).toObject();
-                QString from     = r.value(QStringLiteral("full_name")).toString();
-                QString repo     = QLatin1String(QJsonDocument(r).toJson(QJsonDocument::Compact)); // full metadata
+                const QJsonObject r    = object.value(QStringLiteral("repository")).toObject();
+                const QString from     = r.value(QStringLiteral("full_name")).toString();
+                const QString repo     = QLatin1String(QJsonDocument(r).toJson(QJsonDocument::Compact)); // full metadata
                 // Owner data
-                QJsonObject ow   = r.value(QStringLiteral("owner")).toObject();
-                QString avatar   = ow.value(QStringLiteral("avatar_url")).toString();
+                const QJsonObject ow   = r.value(QStringLiteral("owner")).toObject();
+                const QString avatar   = ow.value(QStringLiteral("avatar_url")).toString();
 
                 // subject/message
-                QJsonObject subj = object.value(QStringLiteral("subject")).toObject();
-                QString title    = subj.value(QStringLiteral("title")).toString();
-                QString type     = subj.value(QStringLiteral("type")).toString();
+                const QJsonObject subj = object.value(QStringLiteral("subject")).toObject();
+                const QString title    = subj.value(QStringLiteral("title")).toString();
+                const QString type     = subj.value(QStringLiteral("type")).toString();
                 // which URL to use?
                 // we have:
                 //  - .url --> go to notification thread
@@ -151,11 +156,11 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 //  - .subject.latest_comment_url --> at least for issues...
                 //  - .repository.url --> URL of repo which "sent" this notification
                 //  - .repository.owner.html_url --> URL of user who "sent" this notification
-                QString url      = subj.value(QStringLiteral("url")).toString();
+                const QString url      = subj.value(QStringLiteral("url")).toString();
 
-                QString reason = object.value(QStringLiteral("reason")).toString();
+                const QString reason = object.value(QStringLiteral("reason")).toString();
                 bool unread    = object.value(QStringLiteral("unread")).toBool();
-                QDateTime updated = QDateTime::fromString(object.value(QStringLiteral("updated_at")).toString(), Qt::ISODate);
+                const QDateTime updated = QDateTime::fromString(object.value(QStringLiteral("updated_at")).toString(), Qt::ISODate);
 
                 m_db.addGithubNotification(accountId,
                                            tid,
