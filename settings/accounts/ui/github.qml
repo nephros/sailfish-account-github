@@ -73,6 +73,40 @@ AccountCreationAgent {
     }
 
     Component {
+        id: oAuthComponent
+        OAuthAccountSetupPage {
+            Component.onCompleted: {
+                var sessionData = {
+                    "ClientId": keyProvider.storedKey("github", "", "client_id"),
+                    "ClientSecret": keyProvider.storedKey("github", "", "client_secret")
+                }
+
+                if ((sessionData["ClientId"] == "") || (sessionData["ClientSecret"] == "")) {
+                    //% "This installation contains no API secrets, setup can not continue."
+                    //% "If you are a developer, you need to provide your own secrets in storedkeys.ini"
+                    var noApiSecretsError = qsTrId("jolla_settings_accounts_extensions-bt-github_error_nosecrets");
+                    root.accountCreationError(noApiSecretsError)
+                    return
+                }
+
+                prepareAccountCreation(root.accountProvider, "github-microblogging", sessionData)
+            }
+
+            onAccountCreated: {
+                root._handleAccountCreated(accountId, responseData)
+            }
+
+            onAccountCreationError: {
+                root.accountCreationError(errorMessage)
+            }
+
+            StoredKeyProvider {
+                id: keyProvider
+            }
+        }
+    }
+
+    Component {
         id: accountSetupComponent
         QtObject {
             id: accountSetup
@@ -85,7 +119,6 @@ AccountCreationAgent {
             signal error()
 
             property Account newAccount: Account {
-                id: account
                 identifier: accountSetup.accountId
 
                 onStatusChanged: {
@@ -153,37 +186,6 @@ AccountCreationAgent {
                 doc.setRequestHeader('X-GitHub-Api-Version', apiVersion);
                 doc.setRequestHeader('Authorization', 'Bearer:' + accessToken);
                 doc.send()
-            }
-        }
-    }
-
-    Component {
-        id: oAuthComponent
-        OAuthAccountSetupPage {
-            Component.onCompleted: {
-                var sessionData = {
-                    "ClientId": keyProvider.storedKey("github", "", "client_id"),
-                    "ClientSecret": keyProvider.storedKey("github", "", "client_secret")
-                }
-
-                if ((sessionData["ClientId"] == "") || (sessionData["ClientSecret"] == "")) {
-                    //% "This installation contains no API secrets, can not continue."
-                    root.accountCreationError(qsTrId("jolla_settings_accounts_extensions-bt-github_error_nosecrets"));
-                    return
-                }
-
-                prepareAccountCreation(root.accountProvider, "github-microblogging", sessionData)
-            }
-            onAccountCreated: {
-                root._handleAccountCreated(accountId, responseData)
-                console.debug("success:", accountId, JSON.stringify(responseData,null,2))
-            }
-            onAccountCreationError: {
-                root.accountCreationError(errorMessage)
-            }
-
-            StoredKeyProvider {
-                id: keyProvider
             }
         }
     }

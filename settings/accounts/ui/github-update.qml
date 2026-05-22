@@ -12,15 +12,41 @@ import com.jolla.settings.accounts 1.0
 AccountCredentialsAgent {
     id: root
 
+    property bool _started
     function _startUpdate() {
-        if (initialPage.status !== PageStatus.Active || account.status !== Account.Initialized) {
+        if (_started || initialPage.status !== PageStatus.Active || account.status !== Account.Initialized) {
             return
         }
-        var sessionData = {
-            "ClientId": keyProvider.storedKey("github", "", "client_id"),
-            "ClientSecret": keyProvider.storedKey("github", "", "client_secret")
+
+        var config = account.configurationValues("mastodon-notifications")
+        var apiHost = _valueFromServiceConfig(config, "api/Host")
+        var oauthHost = _valueFromServiceConfig(config, "auth/oauth2/web_server/Host")
+        var clientId = _valueFromServiceConfig(config, "auth/oauth2/web_server/ClientId")
+        var clientSecret = _valueFromServiceConfig(config, "auth/oauth2/web_server/ClientSecret")
+        if (clientId.length === 0 || clientSecret.length === 0) {
+            //% "Missing GitHub OAuth client credentials"
+            credentialsUpdateError(qsTrId("settings-accounts-github-la-missing_client_credentials"))
+            return
         }
-        initialPage.prepareAccountCredentialsUpdate(account, root.accountProvider, "github-sync", sessionData)
+        var authPath = _valueFromServiceConfig(config, "auth/oauth2/web_server/AuthPath")
+        var tokenPath = _valueFromServiceConfig(config, "auth/oauth2/web_server/TokenPath")
+        var responseType = _valueFromServiceConfig(config, "auth/oauth2/web_server/ResponseType")
+        var oauthScope = _valueFromServiceConfig(config, "auth/oauth2/web_server/Scope")
+        var callbackUri = _valueFromServiceConfig(config, "auth/oauth2/web_server/RedirectUri")
+
+        _started = true
+
+        var sessionData = {
+            "ClientId": clientId,
+            "ClientSecret": clientSecret,
+            "Host": oauthHost,
+            "AuthPath": authPath,
+            "TokenPath": tokenPath,
+            "ResponseType": responseType,
+            "Scope": oauthScope,
+            "RedirectUri": callbackUri
+        }
+        initialPage.prepareAccountCredentialsUpdate(account, root.accountProvider, "github-notifications", sessionData)
     }
 
     Account {
@@ -30,10 +56,6 @@ AccountCredentialsAgent {
         onStatusChanged: {
             root._startUpdate()
         }
-    }
-
-    StoredKeyProvider {
-        id: keyProvider
     }
 
     initialPage: OAuthAccountSetupPage {

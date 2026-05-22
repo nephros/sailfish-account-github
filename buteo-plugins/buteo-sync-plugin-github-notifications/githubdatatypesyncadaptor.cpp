@@ -148,7 +148,7 @@ void GithubDataTypeSyncAdaptor::loadClientIdAndSecret()
     char *cClientId = NULL;
     char *cClientSecret = NULL;
 
-    int cSuccess = SailfishKeyProvider_storedKey("github", "github-sync", "client_id", &cClientId);
+    int cSuccess = SailfishKeyProvider_storedKey("github", "github-notifications", "client_id", &cClientId);
     if (cClientId == NULL) {
         return;
     } else if (cSuccess != 0) {
@@ -159,7 +159,7 @@ void GithubDataTypeSyncAdaptor::loadClientIdAndSecret()
     m_clientId = QLatin1String(cClientId);
     free(cClientId);
 
-    cSuccess = SailfishKeyProvider_storedKey("github", "github-sync", "client_secret", &cClientSecret);
+    cSuccess = SailfishKeyProvider_storedKey("github", "github-notifications", "client_secret", &cClientSecret);
     if (cClientSecret == NULL) {
         return;
     } else if (cSuccess != 0) {
