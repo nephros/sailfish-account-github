@@ -54,10 +54,9 @@ void ensureNotificationTranslations()
 }
 }
 
-
 GithubNotificationsPlugin::GithubNotificationsPlugin(const QString& pluginName,
-                                                     const Buteo::SyncProfile& profile,
-                                                     Buteo::PluginCbInterface *callbackInterface)
+                                         const Buteo::SyncProfile& profile,
+                                         Buteo::PluginCbInterface *callbackInterface)
     : SocialdButeoPlugin(pluginName, profile, callbackInterface,
                          QStringLiteral("github"),
                          SocialNetworkSyncAdaptor::dataTypeName(SocialNetworkSyncAdaptor::Notifications))
