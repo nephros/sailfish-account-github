@@ -114,6 +114,7 @@ AccountCreationAgent {
             property int accountId
             property string accessToken
             property bool hasSetName
+            property string accountDescription
 
             signal done()
             signal error()
@@ -167,9 +168,19 @@ AccountCreationAgent {
                                 return
                             }
 
+                            var providerDisplayName = root.accountProvider && root.accountProvider.displayName
+                                                    ? root.accountProvider.displayName.toString().trim()
+                                                    : ""
+                            if (providerDisplayName.length === 0) {
+                                //% "GitHub"
+                                providerDisplayName = qsTrId("settings-accounts-github-la-provider_name")
+                            }
+                            if (accountDescription.length > 0) {
+                                newAccount.setConfigurationValue("", "description", accountDescription)
+                            }
+                            newAccount.displayName = providerDisplayName
                             newAccount.setConfigurationValue("", "default_credentials_username", name)
                             newAccount.setConfigurationValue("", "default_credentials_id", userId)
-                            newAccount.displayName = name
                             newAccount.iconPath = avatar
                             accountSetup.hasSetName = true
                             newAccount.sync()

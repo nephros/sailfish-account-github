@@ -30,9 +30,9 @@ StandardAccountSettingsDisplay {
             //otherServicesDisplay.serviceModel = otherServices
 
             // load the initial settings, using the first set of sync options as reference
-            var postSyncOptions = allSyncOptionsForService("github-notifications")
-            for (var profileId in postSyncOptions) {
-                notificationSchedule.syncOptions = postSyncOptions[profileId]
+            var notificationSyncOptions = allSyncOptionsForService("github-notifications")
+            for (var profileId in notificationSyncOptions) {
+                notificationSchedule.syncOptions = notificationSyncOptions[profileId]
                 break
             }
         }
@@ -53,6 +53,11 @@ StandardAccountSettingsDisplay {
             IconTextSwitch {
                 checked: model.enabled
                 icon.source: model.iconName
+                //% "Notifications"
+                text: qsTrId("settings-accounts-github-la-service_notifications")
+                //% "Show GitHub notifications."
+                description: qsTrId("settings-accounts-github-la-service_notifications_description")
+                /*
                 text: model.serviceName === "github-notifications"
                            ? //% "Notifications"
                              qsTrId("settings-accounts-github-la-service_notifications")
@@ -62,6 +67,7 @@ StandardAccountSettingsDisplay {
                              qsTrId("settings-accounts-github-la-service_notifications_description")
                            : ""
                 visible: text.length > 0
+                */
                 onCheckedChanged: {
                     if (checked) {
                         root.account.enableWithService(model.serviceName)
