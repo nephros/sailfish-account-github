@@ -16,7 +16,8 @@ public:
     GithubNotificationsDatabase database;
 
 private:
-    Q_DECLARE_PUBLIC(GithubNotificationsModel)
+    // note CamelCase here:
+    Q_DECLARE_PUBLIC(GitHubNotificationsModel)
 };
 
 GithubNotificationsModelPrivate::GithubNotificationsModelPrivate(GithubNotificationsModel *q)

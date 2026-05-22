@@ -22,7 +22,7 @@ SocialMediaAccountDelegate {
     socialNetwork: SocialSync.Github
     dataType: SocialSync.Notifications
 
-    model: GithubNotificationsModel {}
+    model: GitHubNotificationsModel {}
 
     delegate: GitHubFeedItem {
         accountId: model.accounts[0]
