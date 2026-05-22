@@ -11,7 +11,7 @@
 #include <QtSql/QSqlError>
 #include <QtCore/QtDebug>
 
-static const char *DB_NAME = "githubNotifications.db";
+static const char *DB_NAME = "github.db";
 static const int VERSION = 0;
 
 struct GithubNotificationPrivate
