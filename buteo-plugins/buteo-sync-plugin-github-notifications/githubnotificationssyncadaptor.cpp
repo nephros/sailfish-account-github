@@ -180,11 +180,11 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
         m_db.sync();
         m_db.wait();
     } else {
-        // error occurred during request.
-        qCWarning(lcGithubNotifications) << "error: unable to parse notification data from request with account:" << accountId <<
-                          "got:" << QString::fromUtf8(replyData);
+        qCWarning(lcGithubNotifications) << "unable to update notifications data for account" << accountId
+                                  << ", got:" << QString::fromUtf8(replyData);
     }
 
+    decrementSemaphore(accountId);
 }
 
 QDateTime GithubNotificationsSyncAdaptor::lastSuccessfulSyncTime(int accountId)
