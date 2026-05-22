@@ -34,6 +34,8 @@ private:
         QString notificationId;
         QString summary;
         QString body;
+        QString previewSummary;
+        QString previewBody;
         QString subText;
         QString link;
         QString icon;

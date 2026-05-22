@@ -40,11 +40,6 @@ namespace {
 
     const uint NotificationDismissedReason = 1;
 
-    //% "GitHub"
-    const char *const TrIdGitHub = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-github");
-    //% "New notification"
-    const char *const TrIdNewNotification = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-new_notification");
-
     bool hasActiveNotificationsForAccount(int accountId, const Notification *ignoredNotification = 0)
     {
         bool hasActiveNotifications = false;
@@ -64,6 +59,50 @@ namespace {
         return hasActiveNotifications;
     }
 
+    //% "GitHub"
+    const char *const TrIdGitHub = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-github");
+    //% "New notification"
+    const char *const TrIdNewNotification = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-new_notification");
+
+    //% "You were assigned to the issue."
+    const char *const TrIdReasonAssign = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_assign");
+    //% "You created the thread."
+    const char *const TrIdReasonAuthor = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_author");
+    //% "You commented on the thread."
+    const char *const TrIdReasonComment = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_comment");
+    //% "A GitHub Actions workflow run that you triggered was completed."
+    const char *const TrIdReasonCI = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_ci_activity");
+    //% "You accepted an invitation to contribute to the repository."
+    const char *const TrIdReasonInvitation = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_invitation");
+    //% "You subscribed to the thread (via an issue or pull request)."
+    const char *const TrIdReasonManual = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_manual");
+    //% "You were specifically @mentioned in the content."
+    const char *const TrIdReasonMention = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_mention");
+    //% "You, or a team you're a member of, were requested to review a pull request."
+    const char *const TrIdReasonReview = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_review");
+    //% "GitHub discovered a security vulnerability in your repository."
+    const char *const TrIdReasonAlert = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_alert");
+    //% "You changed the thread state (for example, closing an issue or merging a pull request)."
+    const char *const TrIdReasonStateChange = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_state_change");
+    //% "You're watching the repository."
+    const char *const TrIdReasonSubscribe = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_subscribed");
+    //% "You were on a team that was mentioned."
+    const char *const TrIdReasonTeamMention = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_team_mention");
+
+    const QMap<QString, QString> reasonMap = {
+        { QStringLiteral("assign"), TrIdReasonAssign },
+        { QStringLiteral("author"), TrIdReasonAuthor },
+        { QStringLiteral("comment"), TrIdReasonComment },
+        { QStringLiteral("ci_activity"), TrIdReasonCI },
+        { QStringLiteral("invitation"), TrIdReasonInvitation },
+        { QStringLiteral("manual"), TrIdReasonManual },
+        { QStringLiteral("mention"), TrIdReasonMention },
+        { QStringLiteral("review_requested"), TrIdReasonReview },
+        { QStringLiteral("security_alert"), TrIdReasonAlert },
+        { QStringLiteral("state_change"), TrIdReasonStateChange },
+        { QStringLiteral("subscribed"), TrIdReasonSubscribe },
+        { QStringLiteral("team_mention"), TrIdReasonTeamMention }
+    };
 }
 
 GithubNotificationsSyncAdaptor::GithubNotificationsSyncAdaptor(QObject *parent)
@@ -240,14 +279,25 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 const QString url      = subj.value(QStringLiteral("url")).toString();
 
                 const QString reason = object.value(QStringLiteral("reason")).toString();
-                bool unread    = object.value(QStringLiteral("unread")).toBool();
+                //bool unread    = object.value(QStringLiteral("unread")).toBool();
                 const QDateTime updated = QDateTime::fromString(object.value(QStringLiteral("updated_at")).toString(), Qt::ISODate);
+
+                QString body = QString("%1: %2 %3").arg(type).arg(from).arg(reasonMap.value(reason));
+                /*
+                 *  "type": "Issue"
+                 *  "reason": "subscribed",
+                 *  "title": "Greetings"
+                 *  "name": "Hello-World",
+                 *  "full_name": "octocat/Hello-World",
+                 */
 
                 PendingNotification pendingNotification;
                 pendingNotification.notificationId = tid;
+                pendingNotification.previewSummary = QString("%1 (%2)").arg(title).arg(type);
+                pendingNotification.previewBody = body;
                 pendingNotification.summary = QString("%1 (%2)").arg(title).arg(type);
-                pendingNotification.subText = reason;
-//                pendingNotification.body = title;
+                pendingNotification.body = body;
+                pendingNotification.subText = from;
                 pendingNotification.icon = avatar;
                 pendingNotification.link = url;
                 pendingNotification.timestamp = updated;
