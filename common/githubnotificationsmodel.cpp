@@ -10,8 +10,8 @@
 GithubNotificationsModel::GithubNotificationsModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-    connect(&d->database, SIGNAL(notificationsChanged()), this, SLOT(notificationsChanged()));
-    connect(&d->database, SIGNAL(accountIdFilterChanged()), this, SIGNAL(accountIdFilterChanged()));
+    connect(&m_database, SIGNAL(accountIdFilterChanged()),
+            this, SIGNAL(accountIdFilterChanged()));
 }
 
 int GithubNotificationsModel::rowCount(const QModelIndex &parent) const
@@ -47,6 +47,7 @@ QHash<int, QByteArray> GithubNotificationsModel::roleNames() const
     return roleNames;
 }
 
+/*
 QVariantList GithubNotificationsModel::accountIdFilter() const
 {
     return d->database.accountIdFilter();
@@ -56,12 +57,14 @@ void GithubNotificationsModel::setAccountIdFilter(const QVariantList &accountIds
 {
     d->database.setAccountIdFilter(accountIds);
 }
+*/
 
 void GithubNotificationsModel::refresh()
 {
     notificationsChanged();
 }
 
+/*
 void GithubNotificationsModel::remove(const QString &notificationId)
 {
     for (int i=0; i<count(); i++) {
@@ -79,11 +82,12 @@ void GithubNotificationsModel::clear()
     d->clearData();
     d->database.removeAllNotifications();
 }
+*/
 
 void GithubNotificationsModel::notificationsChanged()
 {
-    SocialCacheModelData data;
-    QList<GithubNotification::ConstPtr> notificationsData = d->database.notifications();
+    QList<RowData> data;
+    QList<GithubNotification::ConstPtr> notificationsData = m_database.notifications();
     Q_FOREACH (const GithubNotification::ConstPtr &notification, notificationsData) {
         QMap<int, QVariant> eventMap;
 
@@ -107,5 +111,11 @@ void GithubNotificationsModel::notificationsChanged()
         data.append(eventMap);
     }
 
-    updateData(data);
+    const int oldCount = m_data.count();
+    beginResetModel();
+    m_data = data;
+    endResetModel();
+    if (oldCount != m_data.count()) {
+        emit countChanged();
+    }
 }

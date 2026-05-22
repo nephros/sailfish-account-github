@@ -188,7 +188,8 @@ public:
 GithubNotificationsDatabasePrivate::GithubNotificationsDatabasePrivate(GithubNotificationsDatabase *q)
     : AbstractSocialCacheDatabasePrivate(
             q,
-            SocialSyncInterface::socialNetwork(SocialSyncInterface::Github),
+            //SocialSyncInterface::socialNetwork(SocialSyncInterface::Github),
+            SocialSyncInterface::socialNetwork((SocialSyncInterface::SocialNetwork)10),
             SocialSyncInterface::dataType(SocialSyncInterface::Notifications),
             QLatin1String(DB_NAME),
             VERSION)
