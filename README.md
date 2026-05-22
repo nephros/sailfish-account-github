@@ -19,6 +19,20 @@ plumbing used by other Sailfish OS online services:
 - background updates use Buteo sync plugins
 - posts appear in Events view
 
+## Development/Testing
+
+As long as this is not included in the main distribution, to test this you will have to:
+
+- At GitHub, create an OAuth configuration
+- note down (but keep secret):
+  - Application name
+  - Client ID
+  - Client Secret
+  - Redirect Uri
+- on your device, create a user-specific `storedkeys.ini` as described in https://github.com/nephros/sfos-github-integration/issues/3
+- maybe update provider and service .xml files with the correct Redirect URI
+
+While deprecated, some of the hints at https://github.com/nephros/sfos-github-integration may still apply.
 ## Licensing
 
 This repository contains a mix of `BSD-3-Clause` and
