@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 Jolla Mobile Ltd
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+/*.list
+Makefile
+*.o
+*.so
+*.so.*
+moc_*.cpp
+*.moc
+*.png
+*.ts
+*.qm
+RPMS
