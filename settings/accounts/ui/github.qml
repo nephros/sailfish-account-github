@@ -89,7 +89,7 @@ AccountCreationAgent {
                     return
                 }
 
-                prepareAccountCreation(root.accountProvider, "github-microblogging", sessionData)
+                prepareAccountCreation(root.accountProvider, "github-notifications", sessionData)
             }
 
             onAccountCreated: {
