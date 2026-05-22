@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef GITHUBNOTIFICATIONSYNCADAPTOR_H
-#define GITHUBNOTIFICATIONSYNCADAPTOR_H
+#ifndef GITHUBNOTIFICATIONSSYNCADAPTOR_H
+#define GITHUBNOTIFICATIONSSYNCADAPTOR_H
 
 #include "githubdatatypesyncadaptor.h"
 #include <githubnotificationsdatabase.h>
@@ -71,4 +71,4 @@ private:
     GithubNotificationsDatabase m_db;
 };
 
-#endif // GITHUBNOTIFICATIONSYNCADAPTOR_H
+#endif // GITHUBNOTIFICATIONSSYNCADAPTOR_H
