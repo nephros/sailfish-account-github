@@ -15,8 +15,11 @@ import "shared"
 SocialMediaAccountDelegate {
     id: delegateItem
 
-    headerText: "GitHub Notifications"
-    headerIcon: ( Theme.colorScheme === Theme.LightOnDark ) ? "image://theme/github-mark-white" : "image://theme/github-mark"
+    //% "GitHub Notifications"
+    headerText: qsTrId("lipstick-jolla-home-la-github_notifications")
+    headerIcon: ( Theme.colorScheme === Theme.LightOnDark )
+              ? "image://theme/github-mark-white"
+              : "image://theme/github-mark"
 
     services: [ "Notifications"]
     /*
@@ -29,6 +32,7 @@ SocialMediaAccountDelegate {
     // socialNetwork: SocialSync.GitHub
     socialNetwork: 10
     dataType: SocialSync.Notifications
+    providerName: "github"
 
     model: GitHubNotificationsModel {}
 
