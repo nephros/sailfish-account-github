@@ -31,14 +31,33 @@ protected:
     void finalize(int accountId) override;
 
 private:
+    struct PendingNotification {
+        QString notificationId;
+        QString summary;
+        QString body;
+        QString link;
+        QDateTime timestamp;
+    };
+
     void requestNotifications(int accountId, const QString &accessToken,
                               const QString &until = QString(),
                               const QString &pagingToken = QString());
+
+    void requestMarkRead(int accountId, const QString &accessToken, const QString &lastReadId);
+    void publishSystemNotification(int accountId, const PendingNotification &notificationData);
+    Notification *createNotification(int accountId, const QString &notificationId);
+    Notification *findNotification(int accountId, const QString &notificationId);
+    void closeAccountNotifications(int accountId, const QSet<QString> &keepNotificationIds = QSet<QString>());
+    static QString notificationObjectKey(int accountId, const QString &notificationId);
+
     QDateTime lastSuccessfulSyncTime(int accountId);
     void setLastSuccessfulSyncTime(int accountId);
+    void markReadFromNotification(Notification *notification);
+    void removeCachedNotification(Notification *notification);
 
 private Q_SLOTS:
     void finishedNotificationsHandler();
+    void notificationClosedWithReason(uint reason);
 
 private:
     struct NotificationData {
@@ -48,6 +67,7 @@ private:
         int accountId;
         QJsonObject notification;
     };
+    QHash<QString, Notification *> m_notificationObjects;
     GithubNotificationsDatabase m_db;
 };
 

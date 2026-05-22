@@ -7,16 +7,42 @@
 #include "githubnotificationssyncadaptor.h"
 #include "trace.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
+#include <QtNetwork/QNetworkRequest>
 
-static const int NOTIFICATIONS_LIMIT = 30;
 
-Q_LOGGING_CATEGORY(lcGithubNotifications, "buteo.plugin.github.notifications", QtWarningMsg)
+#include <notification.h>
+
+#define OPEN_URL_ACTION(openUrl)            \
+    Notification::remoteAction(             \
+        "default",                          \
+        "",                                 \
+        "org.sailfishos.fileservice",       \
+        "/",                                \
+        "org.sailfishos.fileservice",       \
+        "openUrl",                          \
+        QVariantList() << openUrl           \
+    )
+
+namespace {
+    Q_LOGGING_CATEGORY(lcGithubNotifications, "buteo.plugin.github.notifications", QtWarningMsg)
+
+    const char *const NotificationCategory = "x-nemo.social.github.notification";
+    const char *const NotificationIdHint = "x-nemo.sociald.notification-id";
+
+    const uint NotificationDismissedReason = 1;
+
+    //% "GitHub"
+    const char *const TrIdGitHub = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-github");
+    //% "New notification"
+    const char *const TrIdNewNotification = QT_TRID_NOOP("lipstick-jolla-home-la-mastodon-notification-new_notification");
+}
 
 GithubNotificationsSyncAdaptor::GithubNotificationsSyncAdaptor(QObject *parent)
     : GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::Notifications, parent)
@@ -56,6 +82,12 @@ void GithubNotificationsSyncAdaptor::finalize(int accountId)
     }
     Q_UNUSED(accountId);
 }
+
+QString GithubNotificationsSyncAdaptor::notificationObjectKey(int accountId, const QString &notificationId)
+{
+    return QString::number(accountId) + QLatin1Char(':') + notificationId;
+}
+
 
 void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const QString &accessToken, const QString &until, const QString &pagingToken)
 {
@@ -186,6 +218,72 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
 
     decrementSemaphore(accountId);
 }
+
+void GithubNotificationsSyncAdaptor::publishSystemNotification(int accountId,
+                                                               const PendingNotification &notificationData)
+{
+    Notification *notification = createNotification(accountId, notificationData.notificationId);
+    notification->setItemCount(1);
+    notification->setTimestamp(notificationData.timestamp.isValid()
+                               ? notificationData.timestamp
+                               : QDateTime::currentDateTimeUtc());
+    notification->setSummary(notificationData.summary.isEmpty()
+                             ? qtTrId(TrIdGitHub)
+                             : notificationData.summary);
+    notification->setBody(notificationData.body.isEmpty()
+                          ? qtTrId(TrIdNewNotification)
+                          : notificationData.body);
+    notification->setPreviewSummary(notificationData.summary);
+    notification->setPreviewBody(notificationData.body);
+
+    const QString openUrl = notificationData.link.isEmpty()
+            ? QStringLiteral("https://github.com//notifications")
+            : notificationData.link;
+    const QUrl parsedOpenUrl(openUrl);
+    notification->setRemoteAction(OPEN_URL_ACTION(openUrl));
+    notification->publish();
+    if (notification->replacesId() == 0) {
+        qCWarning(lcGithubNotifications) << "failed to publish GitHub notification"
+                                  << notificationData.notificationId;
+    }
+}
+
+void GithubNotificationsSyncAdaptor::notificationClosedWithReason(uint reason)
+{
+    Notification *notification = qobject_cast<Notification *>(sender());
+    removeCachedNotification(notification);
+    if (reason == NotificationDismissedReason) {
+        markReadFromNotification(notification);
+    }
+}
+
+Notification *GithubNotificationsSyncAdaptor::createNotification(int accountId, const QString &notificationId)
+{
+    const QString objectKey = notificationObjectKey(accountId, notificationId);
+    Notification *notification = m_notificationObjects.value(objectKey);
+    if (!notification) {
+        notification = findNotification(accountId, notificationId);
+    }
+    if (!notification) {
+        notification = new Notification(this);
+    } else if (notification->parent() != this) {
+        notification->setParent(this);
+    }
+
+    notification->setAppName(QStringLiteral("GitHub"));
+    notification->setAppIcon(QStringLiteral("github-mark-white"));
+    notification->setHintValue("x-nemo.sociald.account-id", accountId);
+    notification->setHintValue(NotificationIdHint, notificationId);
+    notification->setHintValue("x-nemo-feedback", QStringLiteral("social"));
+    notification->setHintValue("x-nemo-priority", 100); // Show on lockscreen
+    notification->setCategory(QLatin1String(NotificationCategory));
+
+    connect(notification, SIGNAL(closed(uint)), this, SLOT(notificationClosedWithReason(uint)), Qt::UniqueConnection);
+    m_notificationObjects.insert(objectKey, notification);
+
+    return notification;
+}
+
 
 QDateTime GithubNotificationsSyncAdaptor::lastSuccessfulSyncTime(int accountId)
 {
