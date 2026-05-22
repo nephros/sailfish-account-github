@@ -17,7 +17,7 @@
 
 class Notification;
 
-class GithubNotificationSyncAdaptor : public GithubDataTypeSyncAdaptor
+class GithubNotificationSyncAdaptor : public GithubNotificationsDataTypeSyncAdaptor
 {
     Q_OBJECT
 
@@ -27,7 +27,7 @@ public:
 
     QString syncServiceName() const;
 
-protected: // implementing GithubDataTypeSyncAdaptor interface
+protected: // implementing GithubNotificationsDataTypeSyncAdaptor interface
     void purgeDataForOldAccount(int oldId, SocialNetworkSyncAdaptor::PurgeMode mode);
     void beginSync(int accountId, const QString &accessToken);
     void finalize(int accountId);

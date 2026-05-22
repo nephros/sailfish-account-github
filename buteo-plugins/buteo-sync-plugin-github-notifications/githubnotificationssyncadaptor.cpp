@@ -16,7 +16,7 @@
 static const int NOTIFICATIONS_LIMIT = 30;
 
 GithubNotificationSyncAdaptor::GithubNotificationSyncAdaptor(QObject *parent)
-    : GithubDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::Notifications, parent)
+    : GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::Notifications, parent)
 {
     //setInitialActive(true);
     setInitialActive(m_db.isValid());

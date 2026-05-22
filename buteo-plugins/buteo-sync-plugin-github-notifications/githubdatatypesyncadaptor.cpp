@@ -27,16 +27,16 @@
 #include <SignOn/SessionData>
 #include <SignOn/Identity>
 
-GithubDataTypeSyncAdaptor::GithubDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::DataType dataType, QObject *parent)
+GithubNotificationsDataTypeSyncAdaptor::GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::DataType dataType, QObject *parent)
     : SocialNetworkSyncAdaptor("github", dataType, 0, parent), m_triedLoading(false)
 {
 }
 
-GithubDataTypeSyncAdaptor::~GithubDataTypeSyncAdaptor()
+GithubNotificationsDataTypeSyncAdaptor::~GithubNotificationsDataTypeSyncAdaptor()
 {
 }
 
-void GithubDataTypeSyncAdaptor::sync(const QString &dataTypeString, int accountId)
+void GithubNotificationsDataTypeSyncAdaptor::sync(const QString &dataTypeString, int accountId)
 {
     if (dataTypeString != SocialNetworkSyncAdaptor::dataTypeName(m_dataType)) {
         qCWarning(lcSocialPlugin) << "Github" << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) <<
@@ -56,7 +56,7 @@ void GithubDataTypeSyncAdaptor::sync(const QString &dataTypeString, int accountI
     qCDebug(lcSocialPlugin) << "successfully triggered sync with profile:" << m_accountSyncProfile->name();
 }
 
-void GithubDataTypeSyncAdaptor::updateDataForAccount(int accountId)
+void GithubNotificationsDataTypeSyncAdaptor::updateDataForAccount(int accountId)
 {
         Accounts::Account *account = Accounts::Account::fromId(m_accountManager, accountId, this);
         if (!account) {
@@ -72,7 +72,7 @@ void GithubDataTypeSyncAdaptor::updateDataForAccount(int accountId)
 }
 
 
-void GithubDataTypeSyncAdaptor::errorHandler(QNetworkReply::NetworkError err)
+void GithubNotificationsDataTypeSyncAdaptor::errorHandler(QNetworkReply::NetworkError err)
 {
         QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
         QByteArray replyData = reply->readAll();
@@ -108,7 +108,7 @@ void GithubDataTypeSyncAdaptor::errorHandler(QNetworkReply::NetworkError err)
     }
 }
 
-void GithubDataTypeSyncAdaptor::sslErrorsHandler(const QList<QSslError> &errs)
+void GithubNotificationsDataTypeSyncAdaptor::sslErrorsHandler(const QList<QSslError> &errs)
 {
     QString sslerrs;
     foreach (const QSslError &e, errs) {
@@ -126,7 +126,7 @@ void GithubDataTypeSyncAdaptor::sslErrorsHandler(const QList<QSslError> &errs)
 }
 
 
-QString GithubDataTypeSyncAdaptor::clientId()
+QString GithubNotificationsDataTypeSyncAdaptor::clientId()
 {
     if (!m_triedLoading) {
         loadClientIdAndSecret();
@@ -134,7 +134,7 @@ QString GithubDataTypeSyncAdaptor::clientId()
     return m_clientId;
 }
 
-QString GithubDataTypeSyncAdaptor::clientSecret()
+QString GithubNotificationsDataTypeSyncAdaptor::clientSecret()
 {
     if (!m_triedLoading) {
         loadClientIdAndSecret();
@@ -142,7 +142,7 @@ QString GithubDataTypeSyncAdaptor::clientSecret()
     return m_clientSecret;
 }
 
-void GithubDataTypeSyncAdaptor::loadClientIdAndSecret()
+void GithubNotificationsDataTypeSyncAdaptor::loadClientIdAndSecret()
 {
     m_triedLoading = true;
     char *cClientId = NULL;
@@ -171,7 +171,7 @@ void GithubDataTypeSyncAdaptor::loadClientIdAndSecret()
     free(cClientSecret);
 }
 
-void GithubDataTypeSyncAdaptor::setCredentialsNeedUpdate(Accounts::Account *account)
+void GithubNotificationsDataTypeSyncAdaptor::setCredentialsNeedUpdate(Accounts::Account *account)
 {
     qCInfo(lcSocialPlugin) << "sociald:Github: setting CredentialsNeedUpdate to true for account:" << account->id();
     Accounts::Service srv(m_accountManager->service(syncServiceName()));
@@ -182,7 +182,7 @@ void GithubDataTypeSyncAdaptor::setCredentialsNeedUpdate(Accounts::Account *acco
     account->syncAndBlock();
 }
 
-void GithubDataTypeSyncAdaptor::signIn(Accounts::Account *account)
+void GithubNotificationsDataTypeSyncAdaptor::signIn(Accounts::Account *account)
 {
     // Fetch clientId from keyprovider
     int accountId = account->id();
@@ -229,7 +229,7 @@ void GithubDataTypeSyncAdaptor::signIn(Accounts::Account *account)
     session->process(SignOn::SessionData(signonSessionData), mechanism);
 }
 
-void GithubDataTypeSyncAdaptor::signOnError(const SignOn::Error &error)
+void GithubNotificationsDataTypeSyncAdaptor::signOnError(const SignOn::Error &error)
 {
     SignOn::AuthSession *session = qobject_cast<SignOn::AuthSession*>(sender());
     Accounts::Account *account = session->property("account").value<Accounts::Account*>();
@@ -254,7 +254,7 @@ void GithubDataTypeSyncAdaptor::signOnError(const SignOn::Error &error)
     decrementSemaphore(accountId);
 }
 
-void GithubDataTypeSyncAdaptor::signOnResponse(const SignOn::SessionData &responseData)
+void GithubNotificationsDataTypeSyncAdaptor::signOnResponse(const SignOn::SessionData &responseData)
 {
     QVariantMap data;
     foreach (const QString &key, responseData.propertyNames()) {

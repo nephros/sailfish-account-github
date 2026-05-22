@@ -30,13 +30,13 @@ namespace SignOn {
     which pull data from the Github social network.
 */
 
-class GithubDataTypeSyncAdaptor : public SocialNetworkSyncAdaptor
+class GithubNotificationsDataTypeSyncAdaptor : public SocialNetworkSyncAdaptor
 {
     Q_OBJECT
 
 public:
-    GithubDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::DataType dataType, QObject *parent);
-    virtual ~GithubDataTypeSyncAdaptor();
+    GithubNotificationsDataTypeSyncAdaptor(SocialNetworkSyncAdaptor::DataType dataType, QObject *parent);
+    virtual ~GithubNotificationsDataTypeSyncAdaptor();
     virtual void sync(const QString &dataTypeString, int accountId);
 
 protected:
