@@ -116,12 +116,12 @@ fi
 %config %{_sysconfdir}/buteo/profiles/client/github-notifications.xml
 %config %{_sysconfdir}/buteo/profiles/sync/github.Notifications.xml
 #%%{_libdir}/qt5/qml/com/jolla/eventsview/github/*
-%{_datadir}/lipstick/eventfeed/github-delegate.qml
-%{_datadir}/lipstick/eventfeed/GitHubFeedItem.qml
-%{_datadir}/translations/lipstick-jolla-home-github_eng_en.qm
+#%%{_datadir}/lipstick/eventfeed/github-delegate.qml
+#%%{_datadir}/lipstick/eventfeed/GitHubFeedItem.qml
+#%%{_datadir}/translations/lipstick-jolla-home-github_eng_en.qm
 %{_datadir}/translations/lipstick-jolla-home-github-notifications_eng_en.qm
 
 %files -n sailfish-account-github-ts-devel
 %{_datadir}/translations/source/settings-accounts-github.ts
-%{_datadir}/translations/source/lipstick-jolla-home-github.ts
+#%%{_datadir}/translations/source/lipstick-jolla-home-github.ts
 %{_datadir}/translations/source/lipstick-jolla-home-github-notifications.ts

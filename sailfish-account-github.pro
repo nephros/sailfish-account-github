@@ -9,8 +9,9 @@ SUBDIRS += \
     common \
     settings \
     buteo-plugins \
-    icons \
-    eventsview-plugins
+    icons
+
+#    eventsview-plugins
 
 buteo-plugins.depends = common
 # transferengine-plugins.depends = common
