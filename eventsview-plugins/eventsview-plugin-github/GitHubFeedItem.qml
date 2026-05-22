@@ -1,10 +1,8 @@
-/****************************************************************************
- **
- ** Copyright (C) 2014 - 2016 Jolla Ltd.
- ** Copyright (C) 2020 Open Mobile Platform LLC.
- ** Copyright (C) 2023 Peter G.
- **
- ****************************************************************************/
+// SPDX-FileCopyrightText: 2019 - 2023 Jolla Ltd.
+// SPDX-FileCopyrightText: 2026 Jolla Mobile Ltd
+// SPDX-FileCopyrightText: 2024-2026 Peter G. <sailfish@nephros.org>
+//
+// SPDX-License-Identifier: BSD-3-Clause
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
