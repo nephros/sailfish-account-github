@@ -8,7 +8,8 @@ TEMPLATE = subdirs
 SUBDIRS += \
     settings \
     buteo-plugins \
-    icons
+    icons \
+    eventsview-plugins
 
 # buteo-plugins.depends = common
 # transferengine-plugins.depends = common
