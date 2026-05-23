@@ -338,8 +338,6 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 //bool unread    = object.value(QStringLiteral("unread")).toBool();
                 const QDateTime updated = QDateTime::fromString(object.value(QStringLiteral("updated_at")).toString(), Qt::ISODate);
 
-                const QString preview = QString("%1: %2 %3").arg(type).arg(from).arg(reasonJiMap.value(reason));
-                const QString body = QString("%1: %2 %3").arg(type).arg(from).arg(reasonStringMap.value(reason));
                 /*
                  *  "type": "Issue"
                  *  "reason": "subscribed",
@@ -350,11 +348,13 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
 
                 PendingNotification pendingNotification;
                 pendingNotification.notificationId = QString::number(tid);
-                pendingNotification.previewSummary = QString("%1 (%2)").arg(title).arg(type);
-                pendingNotification.previewBody = preview;
-                pendingNotification.summary = QString("%1 (%2)").arg(title).arg(type);
-                pendingNotification.body = preview;
-                pendingNotification.subText = from;
+                //pendingNotification.previewSummary = QString("%1 (%2)").arg(title).arg(type);
+                //pendingNotification.previewSummary = QString("%1 (%2)").arg(from).arg(type);
+                //pendingNotification.previewBody = title;
+                //pendingNotification.summary = QString("%1 (%2)").arg(title).arg(type);
+                pendingNotification.summary = QString("%1 (%2)").arg(from).arg(type);
+                pendingNotification.body = title;
+                pendingNotification.subText = reasonJiMap.value(reason);
                 //pendingNotification.icon = avatar;
                 pendingNotification.icon = typeIconMap.value(type);
                 pendingNotification.link = url.toString();
