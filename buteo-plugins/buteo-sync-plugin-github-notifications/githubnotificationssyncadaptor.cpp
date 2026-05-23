@@ -465,3 +465,26 @@ Notification *GithubNotificationsSyncAdaptor::createNotification(int accountId, 
     return notification;
 }
 
+Notification *GithubNotificationsSyncAdaptor::findNotification(int accountId, const QString &notificationId)
+{
+    Notification *notification = 0;
+    QList<QObject *> notifications = Notification::notifications();
+    foreach (QObject *object, notifications) {
+        Notification *castedNotification = qobject_cast<Notification *>(object);
+        if (castedNotification
+                && castedNotification->category() == QLatin1String(NotificationCategory)
+                && castedNotification->hintValue("x-nemo.sociald.account-id").toInt() == accountId
+                && castedNotification->hintValue(NotificationIdHint).toString() == notificationId) {
+            notification = castedNotification;
+            break;
+        }
+    }
+
+    if (notification) {
+        notifications.removeAll(notification);
+    }
+
+    qDeleteAll(notifications);
+
+    return notification;
+}
