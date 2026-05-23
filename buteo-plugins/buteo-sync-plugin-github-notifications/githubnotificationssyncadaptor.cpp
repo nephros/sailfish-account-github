@@ -16,6 +16,10 @@
 #include <QtCore/QUrlQuery>
 #include <QtNetwork/QNetworkRequest>
 
+// libaccounts-qt5
+#include <Accounts/Account>
+#include <Accounts/Manager>
+#include <Accounts/Service>
 
 #include <notification.h>
 
@@ -37,7 +41,8 @@ namespace {
 
     const char *const NotificationCategory = "x-nemo.social.github.notification";
     const char *const NotificationIdHint = "x-nemo.sociald.notification-id";
-
+    const char *const LastFetchedNotificationIdKey = "LastFetchedNotificationId";
+    const int NotificationsPageLimit = 80;
     const uint NotificationDismissedReason = 1;
 
     bool hasActiveNotificationsForAccount(int accountId, const Notification *ignoredNotification = 0)
@@ -204,6 +209,41 @@ QString GithubNotificationsSyncAdaptor::notificationObjectKey(int accountId, con
 {
     return QString::number(accountId) + QLatin1Char(':') + notificationId;
 }
+
+QString GithubNotificationsSyncAdaptor::loadLastFetchedId(int accountId) const
+{
+    Accounts::Account *account = Accounts::Account::fromId(m_accountManager, accountId, 0);
+    if (!account) {
+        return QString();
+    }
+
+    Accounts::Service service(m_accountManager->service(syncServiceName()));
+    account->selectService(service);
+    const QString lastFetchedId = account->value(QString::fromLatin1(LastFetchedNotificationIdKey)).toString().trimmed();
+    account->deleteLater();
+
+    return lastFetchedId;
+}
+
+void GithubNotificationsSyncAdaptor::saveLastFetchedId(int accountId, const QString &lastFetchedId)
+{
+    Accounts::Account *account = Accounts::Account::fromId(m_accountManager, accountId, 0);
+    if (!account) {
+        return;
+    }
+
+    Accounts::Service service(m_accountManager->service(syncServiceName()));
+    account->selectService(service);
+    const QString storedId = account->value(QString::fromLatin1(LastFetchedNotificationIdKey)).toString().trimmed();
+    if (storedId != lastFetchedId) {
+        account->setValue(QString::fromLatin1(LastFetchedNotificationIdKey), lastFetchedId);
+        account->syncAndBlock();
+    }
+
+    account->deleteLater();
+}
+
+
 
 
 
