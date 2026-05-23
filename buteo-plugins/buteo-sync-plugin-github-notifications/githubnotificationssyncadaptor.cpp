@@ -94,7 +94,7 @@ namespace {
     //% "You were on a team that was mentioned."
     const char *const TrIdReasonTeamMention = QT_TRID_NOOP("lipstick-jolla-home-la-github-notification-reason_team_mention");
 
-    const QMap<QString, QString> reasonMap = {
+    const QMap<QString, QString> reasonStringMap = {
         { QStringLiteral("assign"), TrIdReasonAssign },
         { QStringLiteral("author"), TrIdReasonAuthor },
         { QStringLiteral("comment"), TrIdReasonComment },
@@ -108,6 +108,21 @@ namespace {
         { QStringLiteral("subscribed"), TrIdReasonSubscribe },
         { QStringLiteral("team_mention"), TrIdReasonTeamMention }
     };
+    const QMap<QString, QString> reasonJiMap = {
+        { QStringLiteral("assign"), QStringLiteral("🎯") },
+        { QStringLiteral("author"), "" },
+        { QStringLiteral("comment"), QStringLiteral("💬") },
+        { QStringLiteral("ci_activity"), "" },
+        { QStringLiteral("invitation"), QStringLiteral("📨") },
+        { QStringLiteral("manual"), ""  },
+        { QStringLiteral("mention"), QStringLiteral("✋") },
+        { QStringLiteral("review_requested"), QStringLiteral("👀") },
+        { QStringLiteral("security_alert"), QStringLiteral("_") },
+        { QStringLiteral("state_change"), "" },
+        { QStringLiteral("subscribed"), QStringLiteral("👁") },
+        { QStringLiteral("team_mention"), QStringLiteral("🙌") }
+    };
+
     const QMap<QString, QString> typeIconMap = {
         // see https://primer.style/design/foundations/icons
        { QStringLiteral("Action"),           QStringLiteral("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\"><path fill=\"darkgray\"    d=\"M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm4.879-2.773 4.264 2.559a.25.25 0 0 1 0 .428l-4.264 2.559A.25.25 0 0 1 6 10.559V5.442a.25.25 0 0 1 .379-.215Z\"></path></svg>") },
@@ -342,7 +357,8 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 //bool unread    = object.value(QStringLiteral("unread")).toBool();
                 const QDateTime updated = QDateTime::fromString(object.value(QStringLiteral("updated_at")).toString(), Qt::ISODate);
 
-                const QString body = QString("%1: %2 %3").arg(type).arg(from).arg(reasonMap.value(reason));
+                const QString preview = QString("%1: %2 %3").arg(type).arg(from).arg(reasonJiMap.value(reason));
+                const QString body = QString("%1: %2 %3").arg(type).arg(from).arg(reasonStringMap.value(reason));
                 /*
                  *  "type": "Issue"
                  *  "reason": "subscribed",
@@ -354,7 +370,7 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 PendingNotification pendingNotification;
                 pendingNotification.notificationId = QString::number(tid);
                 pendingNotification.previewSummary = QString("%1 (%2)").arg(title).arg(type);
-                pendingNotification.previewBody = body;
+                pendingNotification.previewBody = preview;
                 pendingNotification.summary = QString("%1 (%2)").arg(title).arg(type);
                 pendingNotification.body = body;
                 pendingNotification.subText = from;
