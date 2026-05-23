@@ -29,7 +29,8 @@ Q_LOGGING_CATEGORY(lcGithubNotificationsSync, "buteo.plugin.github.notifications
 GithubNotificationsDataTypeSyncAdaptor::GithubNotificationsDataTypeSyncAdaptor(
         SocialNetworkSyncAdaptor::DataType dataType,
         QObject *parent)
-    : SocialNetworkSyncAdaptor(QStringLiteral("github"), dataType, 0, parent)
+    : SocialNetworkSyncAdaptor(QStringLiteral("github"), dataType, 0, parent),
+    m_triedLoading(false)
 {
 }
 
