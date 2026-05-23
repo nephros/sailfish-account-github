@@ -9,7 +9,7 @@ TARGET = github-notifications-client
 QT -= gui
 
 include($$PWD/../buteo-common/buteo-common.pri)
-include($$PWD/../../common/common.pri)
+#include($$PWD/../../common/common.pri)
 
 TS_FILE = $$OUT_PWD/lipstick-jolla-home-github-notifications.ts
 EE_QM = $$OUT_PWD/lipstick-jolla-home-github-notifications_eng_en.qm
