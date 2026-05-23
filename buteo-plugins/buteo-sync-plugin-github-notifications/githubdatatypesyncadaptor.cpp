@@ -41,8 +41,8 @@ GithubNotificationsDataTypeSyncAdaptor::~GithubNotificationsDataTypeSyncAdaptor(
 void GithubNotificationsDataTypeSyncAdaptor::sync(const QString &dataTypeString, int accountId)
 {
     if (dataTypeString != SocialNetworkSyncAdaptor::dataTypeName(m_dataType)) {
-        qCWarning(lcGithubNotificationsSync) << "Github" << SocialNetworkSyncAdaptor::dataTypeName(m_dataType) <<
-                          "sync adaptor was asked to sync" << dataTypeString;
+        qCWarning(lcGithubNotificationsSync) << "Github" << SocialNetworkSyncAdaptor::dataTypeName(m_dataType)
+                                  << "sync adaptor was asked to sync" << dataTypeString;
         setStatus(SocialNetworkSyncAdaptor::Error);
         return;
     }
@@ -114,7 +114,6 @@ void GithubNotificationsDataTypeSyncAdaptor::sslErrorsHandler(const QList<QSslEr
     // Note: not all errors are "unrecoverable" errors, so we don't change the status here.
 }
 
-
 QString GithubNotificationsDataTypeSyncAdaptor::clientId()
 {
     if (!m_triedLoading) {
@@ -181,7 +180,10 @@ void GithubNotificationsDataTypeSyncAdaptor::signIn(Accounts::Account *account)
 
     Accounts::Service srv(m_accountManager->service(syncServiceName()));
     account->selectService(srv);
-    SignOn::Identity *identity = account->credentialsId() > 0 ? SignOn::Identity::existingIdentity(account->credentialsId()) : 0;
+
+    SignOn::Identity *identity = account->credentialsId() > 0
+            ? SignOn::Identity::existingIdentity(account->credentialsId())
+            : 0;
     if (!identity) {
         qCWarning(lcGithubNotificationsSync) << "error: account has no valid credentials, cannot sign in:" << accountId;
         decrementSemaphore(accountId);
@@ -189,8 +191,8 @@ void GithubNotificationsDataTypeSyncAdaptor::signIn(Accounts::Account *account)
     }
 
     Accounts::AccountService accSrv(account, srv);
-    QString method = accSrv.authData().method();
-    QString mechanism = accSrv.authData().mechanism();
+    const QString method = accSrv.authData().method();
+    const QString mechanism = accSrv.authData().mechanism();
     SignOn::AuthSession *session = identity->createSession(method);
     if (!session) {
         qCWarning(lcGithubNotificationsSync) << "error: could not create signon session for account:" << accountId;
@@ -221,12 +223,11 @@ void GithubNotificationsDataTypeSyncAdaptor::signOnError(const SignOn::Error &er
     SignOn::AuthSession *session = qobject_cast<SignOn::AuthSession*>(sender());
     Accounts::Account *account = session->property("account").value<Accounts::Account*>();
     SignOn::Identity *identity = session->property("identity").value<SignOn::Identity*>();
-    int accountId = account->id();
-    qCWarning(lcGithubNotificationsSync) << "credentials for account with id" << accountId <<
-                      "couldn't be retrieved:" << error.type() << "," << error.message();
+    const int accountId = account->id();
 
-    // if the error is because credentials have expired, we
-    // set the CredentialsNeedUpdate key.
+    qCWarning(lcGithubNotificationsSync) << "credentials for account with id" << accountId
+                              << "couldn't be retrieved:" << error.type() << "," << error.message();
+
     if (error.type() == SignOn::Error::UserInteraction) {
         setCredentialsNeedUpdate(account);
     }
@@ -236,7 +237,6 @@ void GithubNotificationsDataTypeSyncAdaptor::signOnError(const SignOn::Error &er
     identity->deleteLater();
     account->deleteLater();
 
-    // if we couldn't sign in, we can't sync with this account.
     setStatus(SocialNetworkSyncAdaptor::Error);
     decrementSemaphore(accountId);
 }
