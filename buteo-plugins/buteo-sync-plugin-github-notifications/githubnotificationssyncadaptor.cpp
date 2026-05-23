@@ -353,7 +353,7 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 pendingNotification.previewSummary = QString("%1 (%2)").arg(title).arg(type);
                 pendingNotification.previewBody = preview;
                 pendingNotification.summary = QString("%1 (%2)").arg(title).arg(type);
-                pendingNotification.body = body;
+                pendingNotification.body = preview;
                 pendingNotification.subText = from;
                 //pendingNotification.icon = avatar;
                 pendingNotification.icon = typeIconMap.value(type);
@@ -401,6 +401,7 @@ void GithubNotificationsSyncAdaptor::publishSystemNotification(int accountId,
                           : notificationData.body);
     notification->setPreviewSummary(notificationData.summary);
     notification->setPreviewBody(notificationData.body);
+    notification->setIcon(notificationData.icon);
 
     const QString openUrl = notificationData.link.isEmpty()
             ? QStringLiteral("https://github.com//notifications")
