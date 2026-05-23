@@ -155,13 +155,6 @@ QString GithubNotificationsSyncAdaptor::syncServiceName() const
     return QStringLiteral("github-notifications");
 }
 
-/*
-QString MastodonNotificationsSyncAdaptor::authServiceName() const
-{
-    return QStringLiteral("mastodon-microblog");
-}
-*/
-
 void GithubNotificationsSyncAdaptor::purgeDataForOldAccount(int oldId, SocialNetworkSyncAdaptor::PurgeMode)
 {
     closeAccountNotifications(oldId);
@@ -187,18 +180,6 @@ void GithubNotificationsSyncAdaptor::finalize(int accountId)
 
     Q_UNUSED(accountId);
 }
-
-/*
-QString MastodonNotificationsSyncAdaptor::sanitizeContent(const QString &content)
-{
-    return MastodonTextUtils::sanitizeContent(content);
-}
-
-QDateTime MastodonNotificationsSyncAdaptor::parseTimestamp(const QString &timestampString)
-{
-    return MastodonTextUtils::parseTimestamp(timestampString);
-}
-*/
 
 int GithubNotificationsSyncAdaptor::compareNotificationIds(const QString &left, const QString &right)
 {
