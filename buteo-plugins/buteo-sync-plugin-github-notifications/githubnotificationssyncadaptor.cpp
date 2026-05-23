@@ -259,15 +259,17 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
 
     bool ok = false;
     const QJsonArray data = parseJsonArrayReplyData(replyData, &ok);
+    PendingSyncState state = m_pendingSyncStates.value(accountId);
 
     // https://docs.github.com/en/rest/activity/notifications?apiVersion=2022-11-28
     if (!isError && ok && data.count() > 0) {
+    qCDebug(lcGithubNotifications) << "got notifications:" << data.count();
 
         foreach (const QJsonValue &entry, data) {
             const QJsonObject object = entry.toObject();
             if (!object.isEmpty()) {
                 // NB: the spec has this as a string! Also, conversion from JSON->String->UInt is very finicky.
-                quint32 tid      = object.value(QStringLiteral("id")).toString().toULong();
+                const quint32 tid      = object.value(QStringLiteral("id")).toString().toULong();
                 if (tid == 0) {
                         qCWarning(lcGithubNotifications) << "Error: id is zero, (wither not a number or conversion failed) skipping entry.";
                         continue;
@@ -297,7 +299,7 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 //bool unread    = object.value(QStringLiteral("unread")).toBool();
                 const QDateTime updated = QDateTime::fromString(object.value(QStringLiteral("updated_at")).toString(), Qt::ISODate);
 
-                QString body = QString("%1: %2 %3").arg(type).arg(from).arg(reasonMap.value(reason));
+                const QString body = QString("%1: %2 %3").arg(type).arg(from).arg(reasonMap.value(reason));
                 /*
                  *  "type": "Issue"
                  *  "reason": "subscribed",
@@ -307,7 +309,7 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                  */
 
                 PendingNotification pendingNotification;
-                pendingNotification.notificationId = tid;
+                pendingNotification.notificationId = QString::number(tid);
                 pendingNotification.previewSummary = QString("%1 (%2)").arg(title).arg(type);
                 pendingNotification.previewBody = body;
                 pendingNotification.summary = QString("%1 (%2)").arg(title).arg(type);
@@ -317,13 +319,11 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 pendingNotification.icon = typeIconMap.value(type);
                 pendingNotification.link = url;
                 pendingNotification.timestamp = updated;
-                PendingSyncState state = m_pendingSyncStates.value(accountId);
-                state.pendingNotifications.insert(pendingNotification.notificationId, pendingNotification);
+                state.pendingNotifications.insert( QString::number(tid), pendingNotification);
             } else {
                 qCDebug(lcGithubNotifications) << "notification object empty; skipping";
             }
         }
-        PendingSyncState state = m_pendingSyncStates.value(accountId);
 
         if (state.pendingNotifications.size() > 0) {
             QStringList notificationIds = state.pendingNotifications.keys();
