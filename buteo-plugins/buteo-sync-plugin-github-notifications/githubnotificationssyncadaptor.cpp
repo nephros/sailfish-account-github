@@ -293,7 +293,10 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 //  - .subject.latest_comment_url --> at least for issues...
                 //  - .repository.url --> URL of repo which "sent" this notification
                 //  - .repository.owner.html_url --> URL of user who "sent" this notification
-                const QString url      = subj.value(QStringLiteral("url")).toString();
+                //const QString url      = subj.value(QStringLiteral("url")).toString();
+                QUrl url(subj.value(QStringLiteral("url")).toString());
+                // url has api.github.com as the host, replace that:
+                url.setHost(QStringLiteral("github.com"));
 
                 const QString reason = object.value(QStringLiteral("reason")).toString();
                 //bool unread    = object.value(QStringLiteral("unread")).toBool();
@@ -317,7 +320,7 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 pendingNotification.subText = from;
                 //pendingNotification.icon = avatar;
                 pendingNotification.icon = typeIconMap.value(type);
-                pendingNotification.link = url;
+                pendingNotification.link = url.toString();
                 pendingNotification.timestamp = updated;
                 state.pendingNotifications.insert( QString::number(tid), pendingNotification);
             } else {
