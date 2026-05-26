@@ -111,7 +111,7 @@ fi
 %{_datadir}/accounts/ui/github-update.qml
 %{_libdir}/qt5/qml/com/jolla/settings/accounts/github/*
 %{_datadir}/translations/settings-accounts-github_eng_en.qm
-%{_datadir}/themes/sailfish-default/silica/*/icons/github-mark*.png
+%{_datadir}/themes/sailfish-default/*/*/icons/github-mark*.png
 %{_libdir}/buteo-plugins-qt5/oopp/libgithub-notifications-client.so
 %config %{_sysconfdir}/buteo/profiles/client/github-notifications.xml
 %config %{_sysconfdir}/buteo/profiles/sync/github.Notifications.xml
