@@ -71,6 +71,10 @@ private:
                                            const QString &accessToken,
                                            Notification *ignoredNotification = 0);
     void markReadFromNotification(Notification *notification);
+    void maybeMarkAccountNotificationsDone(int accountId,
+                                           const QString &accessToken,
+                                           Notification *ignoredNotification = 0);
+    void markDoneFromNotification(Notification *notification);
     void removeCachedNotification(Notification *notification);
 
 private Q_SLOTS:
