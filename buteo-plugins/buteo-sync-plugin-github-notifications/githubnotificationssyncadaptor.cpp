@@ -247,8 +247,11 @@ void GithubNotificationsSyncAdaptor::saveLastFetchedId(int accountId, const QStr
 void GithubNotificationsSyncAdaptor::requestNotifications(int accountId, const QString &accessToken)
 {
     QList<QPair<QString, QString> > queryItems;
-    queryItems.append(QPair<QString, QString>(QString(QLatin1String("all")), QString(QLatin1String("true"))));
-    queryItems.append(QPair<QString, QString>(QString(QLatin1String("participating")), QString(QLatin1String("true"))));
+    // show unread?
+//    queryItems.append(QPair<QString, QString>(QString(QLatin1String("all")), QString(QLatin1String("true"))));
+    queryItems.append(QPair<QString, QString>(QString(QLatin1String("all")), QString(QLatin1String("false"))));
+//    queryItems.append(QPair<QString, QString>(QString(QLatin1String("participating")), QString(QLatin1String("true"))));
+    queryItems.append(QPair<QString, QString>(QString(QLatin1String("per_page")), QString(QLatin1String("12"))));
     QUrl url(QStringLiteral("https://api.github.com/notifications"));
     QUrlQuery query(url);
     query.setQueryItems(queryItems);
