@@ -37,6 +37,7 @@ private:
         QString previewSummary;
         QString previewBody;
         QString subText;
+        Notification::Urgency urgency;
         QString link;
         QString icon;
         QDateTime timestamp;

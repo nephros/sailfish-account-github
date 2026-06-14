@@ -336,6 +336,10 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 QUrl url(subj.value(QStringLiteral("url")).toString());
                 // url has api.github.com as the host, replace that:
                 url.setHost(QStringLiteral("github.com"));
+                QString path = url.path();
+                path.replace("/repos", "");
+                url.setPath(path);
+
 
                 const QString reason = object.value(QStringLiteral("reason")).toString();
                 //bool unread    = object.value(QStringLiteral("unread")).toBool();
@@ -361,6 +365,7 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 //pendingNotification.icon = avatar;
                 pendingNotification.icon = typeIconMap.value(type);
                 pendingNotification.link = url.toString();
+                pendingNotification.urgency = unread ? Notification::Normal : Notification::Low;
                 pendingNotification.timestamp = updated;
                 state.pendingNotifications.insert( QString::number(tid), pendingNotification);
             } else {
