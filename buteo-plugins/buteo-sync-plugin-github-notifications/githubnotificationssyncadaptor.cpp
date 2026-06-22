@@ -310,7 +310,7 @@ void GithubNotificationsSyncAdaptor::finishedNotificationsHandler()
                 // NB: the spec has this as a string! Also, conversion from JSON->String->UInt is very finicky.
                 const quint32 tid      = object.value(QStringLiteral("id")).toString().toULong();
                 if (tid == 0) {
-                        qCWarning(lcGithubNotifications) << "Error: id is zero, (wither not a number or conversion failed) skipping entry.";
+                        qCWarning(lcGithubNotifications) << "Error: id is zero, (either not a number or conversion failed) skipping entry.";
                         continue;
                 }
                 // repo data:
